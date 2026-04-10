@@ -1,6 +1,8 @@
 ---
 - name: "Create IP addresses on {{ __netbox_device_interface_pair.0.name }}/{{ __netbox_device_interface_pair.1.name }}"
   netbox.netbox.netbox_ip_address:
+    netbox_url: "{{ netbox_url }}"
+    netbox_token: "{{ netbox_token }}"
     data:
       address: "{{ item.address }}"
       dns_name: "{{ item.dns_name | default(omit) }}"
@@ -15,6 +17,8 @@
 
 - name: "Set primary IPv4 on {{ __netbox_device_interface_pair.0.name }}"
   netbox.netbox.netbox_device:
+    netbox_url: "{{ netbox_url }}"
+    netbox_token: "{{ netbox_token }}"
     data:
       name: "{{ __netbox_device_interface_pair.0.name }}"
       primary_ip4: "{{ __ip_result.ip_address.id }}"

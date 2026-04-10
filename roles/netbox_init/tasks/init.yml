@@ -14,6 +14,8 @@
 
 - name: "Create NetBox regions"
   netbox.netbox.netbox_region:
+    netbox_url: "{{ netbox_url }}"
+    netbox_token: "{{ netbox_token }}"
     data:
       name: "{{ item.name }}"
       description: "{{ item.description | default(omit) }}"
@@ -22,6 +24,8 @@
 
 - name: "Create NetBox sites"
   netbox.netbox.netbox_site:
+    netbox_url: "{{ netbox_url }}"
+    netbox_token: "{{ netbox_token }}"
     data:
       name: "{{ item.name }}"
       facility: "{{ item.facility | default(omit) }}"
@@ -34,6 +38,8 @@
 
 - name: "Create NetBox tenant groups"
   netbox.netbox.netbox_tenant_group:
+    netbox_url: "{{ netbox_url }}"
+    netbox_token: "{{ netbox_token }}"
     data:
       name: "{{ item.name }}"
     state: present
@@ -41,6 +47,8 @@
 
 - name: "Create NetBox tenants"
   netbox.netbox.netbox_tenant:
+    netbox_url: "{{ netbox_url }}"
+    netbox_token: "{{ netbox_token }}"
     data:
       name: "{{ item.name }}"
       tenant_group: "{{ item.tenant_group | default(omit) }}"
@@ -49,6 +57,8 @@
 
 - name: "Create NetBox contact groups"
   netbox.netbox.netbox_contact_group:
+    netbox_url: "{{ netbox_url }}"
+    netbox_token: "{{ netbox_token }}"
     data:
       name: "{{ item.name }}"
     state: present
@@ -56,6 +66,8 @@
 
 - name: "Create NetBox contact roles"
   netbox.netbox.netbox_contact_role:
+    netbox_url: "{{ netbox_url }}"
+    netbox_token: "{{ netbox_token }}"
     data:
       name: "{{ item.name }}"
     state: present
@@ -63,6 +75,8 @@
 
 - name: "Create NetBox contacts"
   netbox.netbox.netbox_contact:
+    netbox_url: "{{ netbox_url }}"
+    netbox_token: "{{ netbox_token }}"
     data:
       name: "{{ item.name }}"
       email: "{{ item.email | default(omit) }}"
@@ -76,6 +90,8 @@
 
 - name: "Create NetBox racks"
   netbox.netbox.netbox_rack:
+    netbox_url: "{{ netbox_url }}"
+    netbox_token: "{{ netbox_token }}"
     data:
       name: "{{ item.name }}"
       site: "{{ item.site }}"
@@ -88,6 +104,8 @@
 
 - name: Create device role within NetBox with only required information
   netbox.netbox.netbox_device_role:
+    netbox_url: "{{ netbox_url }}"
+    netbox_token: "{{ netbox_token }}"
     data:
       name: "{{ item.name }}"
       color: "{{ item.color }}"
@@ -96,6 +114,8 @@
 
 - name: Create manufacturer within NetBox with only required information
   netbox.netbox.netbox_manufacturer:
+    netbox_url: "{{ netbox_url }}"
+    netbox_token: "{{ netbox_token }}"
     data:
       name: "{{ item.name }}"
     state: present
@@ -103,6 +123,8 @@
 
 - name: Create device type within NetBox with only required information
   netbox.netbox.netbox_device_type:
+    netbox_url: "{{ netbox_url }}"
+    netbox_token: "{{ netbox_token }}"
     data:
       model: "{{ item.model }}"
       manufacturer: "{{ item.manufacturer }}"
@@ -114,6 +136,8 @@
 
 - name: "Create NetBox devices"
   netbox.netbox.netbox_device:
+    netbox_url: "{{ netbox_url }}"
+    netbox_token: "{{ netbox_token }}"
     data:
       name: "{{ item.name }}"
       device_type: "{{ item.device_type }}"
@@ -128,6 +152,8 @@
 
 - name: "Create NetBox device interfaces"
   netbox.netbox.netbox_device_interface:
+    netbox_url: "{{ netbox_url }}"
+    netbox_token: "{{ netbox_token }}"
     data:
       name: "{{ item.1.name }}"
       type: "{{ item.1.type }}"
@@ -148,6 +174,8 @@
 
 - name: "Create NetBox VLANs"
   netbox.netbox.netbox_vlan:
+    netbox_url: "{{ netbox_url }}"
+    netbox_token: "{{ netbox_token }}"
     data:
       name: "{{ item.name }}"
       vid: "{{ item.vid }}"
@@ -157,6 +185,8 @@
 
 - name: "Create NetBox prefixes"
   netbox.netbox.netbox_prefix:
+    netbox_url: "{{ netbox_url }}"
+    netbox_token: "{{ netbox_token }}"
     data:
       prefix: "{{ item.prefix }}"
       status: "{{ item.status | default(omit) }}"
@@ -169,6 +199,8 @@
 
 - name: "Create NetBox cluster types"
   netbox.netbox.netbox_cluster_type:
+    netbox_url: "{{ netbox_url }}"
+    netbox_token: "{{ netbox_token }}"
     data:
       name: "{{ item.name }}"
     state: present
@@ -176,6 +208,8 @@
 
 - name: "Create NetBox clusters"
   netbox.netbox.netbox_cluster:
+    netbox_url: "{{ netbox_url }}"
+    netbox_token: "{{ netbox_token }}"
     data:
       name: "{{ item.name }}"
       cluster_type: "{{ item.cluster_type_name }}"
@@ -189,6 +223,8 @@
 
 - name: "Create NetBox wireless LANs"
   netbox.netbox.netbox_wireless_lan:
+    netbox_url: "{{ netbox_url }}"
+    netbox_token: "{{ netbox_token }}"
     data:
       ssid: "{{ item.ssid }}"
       description: "{{ item.description | default(omit) }}"

@@ -2,7 +2,7 @@
 - name: Pulling existing aliases
   oxlorg.opnsense.list:
     target: alias
-  register: existing_aliases
+  register: firewall_existing_aliases
 
 - name: Purging unconfigured aliases
   # ansible.builtin.debug:
@@ -21,8 +21,8 @@
   loop_control:
     loop_var: existing_alias_item
     label: "{{ existing_alias_item.name }}"
-  with_items: "{{ existing_aliases.data }}"
-  register: purged_aliases
+  with_items: "{{ firewall_existing_aliases.data }}"
+  register: firewall_purged_aliases
 
 - name: Creating aliases
   oxlorg.opnsense.alias:
@@ -43,9 +43,9 @@
     loop_var: alias_item
     label: "{{ alias_item.key }}"
   with_dict: "{{ firewall_aliases }}"
-  register: created_aliases
+  register: firewall_created_aliases
 
 - name: Reload aliases config
   oxlorg.opnsense.reload:
     target: "alias"
-  when: purged_aliases.changed or created_aliases.changed
+  when: firewall_purged_aliases.changed or firewall_created_aliases.changed

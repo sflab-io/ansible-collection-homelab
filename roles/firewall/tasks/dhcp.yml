@@ -5,7 +5,7 @@
     module: dnsmasq
     controller: settings
     command: get
-  register: dnsmasq
+  register: firewall_dnsmasq
 
 - name: Disable dnsmasq
   oxlorg.opnsense.raw:
@@ -16,7 +16,7 @@
     data:
       dnsmasq:
         enable: 0
-  when: dnsmasq.response.dnsmasq.enable != "0"
+  when: firewall_dnsmasq.response.dnsmasq.enable != "0"
 
 # dhcp controller management
 - name: Configure DHCP server
@@ -30,11 +30,11 @@
 - name: Pulling existing DHCP subnets
   oxlorg.opnsense.list:
     target: dhcp_subnet
-  register: existing_subnets
+  register: firewall_existing_subnets
 
 - name: Debug print existing subnets
   ansible.builtin.debug:
-    var: existing_subnets.data
+    var: firewall_existing_subnets.data
 
 - name: Purging unconfigured DHCP subnets
   oxlorg.opnsense.dhcp_subnet:
@@ -52,8 +52,8 @@
   loop_control:
     loop_var: existing_subnet_item
     label: "{{ existing_subnet_item.subnet }}"
-  with_items: "{{ existing_subnets.data }}"
-  register: purged_subnets
+  with_items: "{{ firewall_existing_subnets.data }}"
+  register: firewall_purged_subnets
 
 - name: Creating DHCP subnets
   oxlorg.opnsense.dhcp_subnet:
@@ -87,13 +87,13 @@
     loop_var: subnet_item
     label: "{{ subnet_item.key }}"
   with_dict: "{{ firewall_dhcp_subnets }}"
-  register: created_subnets
+  register: firewall_created_subnets
 
 # DHCP reservations management
 - name: Pulling existing DHCP reservations
   oxlorg.opnsense.list:
     target: dhcp_reservation
-  register: existing_reservations
+  register: firewall_existing_reservations
 
 - name: Purging unconfigured DHCP reservations
   oxlorg.opnsense.dhcp_reservation:
@@ -108,8 +108,8 @@
   loop_control:
     loop_var: existing_reservation_item
     label: "{{ existing_reservation_item.mac }}"
-  with_items: "{{ existing_reservations.data }}"
-  register: purged_reservations
+  with_items: "{{ firewall_existing_reservations.data }}"
+  register: firewall_purged_reservations
 
 - name: Creating DHCP reservations
   oxlorg.opnsense.dhcp_reservation:
@@ -131,10 +131,12 @@
     loop_var: reservation_item
     label: "{{ reservation_item.key }}"
   with_dict: "{{ firewall_dhcp_reservations }}"
-  register: created_reservations
+  register: firewall_created_reservations
 
 # A reload for everything
 - name: Reload dhcp config
   oxlorg.opnsense.reload:
     target: "dhcp"
-  when: purged_subnets.changed or created_subnets.changed or purged_reservations.changed or created_reservations.changed
+  when: >-
+    firewall_purged_subnets.changed or firewall_created_subnets.changed or
+    firewall_purged_reservations.changed or firewall_created_reservations.changed
