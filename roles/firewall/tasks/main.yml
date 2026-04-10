@@ -1,40 +1,40 @@
 ---
 - name: Include task validate.yml
-  include_tasks: validate.yml
+  ansible.builtin.include_tasks: validate.yml
 
 # including required tasks
 - name: Include VLAN management
-  include_tasks: vlans.yml
+  ansible.builtin.include_tasks: vlans.yml
   when: firewall_vlans.keys() | length > 0
 
 - name: Include gateway management
-  include_tasks: gateways.yml
+  ansible.builtin.include_tasks: gateways.yml
   when: firewall_gateways.keys() | length > 0
 
 # # - name: Include tailscale management
-# #   include_tasks: tailscale.yml
+# #   ansible.builtin.include_tasks: tailscale.yml
 # #   when: firewall_tailscale_advertised_routes | length > 0
 
 - name: Include dhcp management
-  include_tasks: dhcp.yml
+  ansible.builtin.include_tasks: dhcp.yml
   when: firewall_dhcp.keys() | length > 0
 
-- name: include alias management
-  include_tasks: aliases.yml
+- name: Include alias management
+  ansible.builtin.include_tasks: aliases.yml
   when: firewall_aliases.keys() | length > 0
 
-- name: include NAT management
-  include_tasks: nat.yml
+- name: Include NAT management
+  ansible.builtin.include_tasks: nat.yml
   when: firewall_nat_outbound.keys() | length > 0
 
-- name: include shaper management
-  include_tasks: shaper.yml
+- name: Include shaper management
+  ansible.builtin.include_tasks: shaper.yml
   when: firewall_shaper_pipes.keys() | length > 0
 
-- name: include rule management
-  include_tasks: rules.yml
+- name: Include rule management
+  ansible.builtin.include_tasks: rules.yml
   when: firewall_rules.keys() | length > 0
 # ---
 
 # - name: Include task from tls
-#   include_tasks: tls.yml
+#   ansible.builtin.include_tasks: tls.yml

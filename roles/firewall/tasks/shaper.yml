@@ -3,7 +3,7 @@
 - name: Pulling existing shaper rules
   oxlorg.opnsense.list:
     target: shaper_rule
-  register: existing_rules
+  register: firewall_existing_shaper_rules
 
 - name: Purging unconfigured shaper rules
   oxlorg.opnsense.shaper_rule:
@@ -20,14 +20,14 @@
   loop_control:
     loop_var: existing_rule_item
     label: "{{ existing_rule_item.description }}"
-  with_items: "{{ existing_rules.data }}"
-  register: purged_rules
+  with_items: "{{ firewall_existing_shaper_rules.data }}"
+  register: firewall_purged_shaper_rules
 
 # purge queues
 - name: Pulling existing shaper queues
   oxlorg.opnsense.list:
     target: shaper_queue
-  register: existing_queues
+  register: firewall_existing_queues
 
 - name: Purging unconfigured shaper pipes
   oxlorg.opnsense.shaper_queue:
@@ -44,14 +44,14 @@
   loop_control:
     loop_var: existing_queue_item
     label: "{{ existing_queue_item.description }}"
-  with_items: "{{ existing_queues.data }}"
-  register: purged_queues
+  with_items: "{{ firewall_existing_queues.data }}"
+  register: firewall_purged_queues
 
 # purge pipes
 - name: Pulling existing shaper pipes
   oxlorg.opnsense.list:
     target: shaper_pipe
-  register: existing_pipes
+  register: firewall_existing_pipes
 
 - name: Purging unconfigured shaper pipes
   oxlorg.opnsense.shaper_pipe:
@@ -68,8 +68,8 @@
   loop_control:
     loop_var: existing_pipe_item
     label: "{{ existing_pipe_item.description }}"
-  with_items: "{{ existing_pipes.data }}"
-  register: purged_pipes
+  with_items: "{{ firewall_existing_pipes.data }}"
+  register: firewall_purged_pipes
 
 # create pipes
 - name: Creating shaper pipes
@@ -94,7 +94,7 @@
     loop_var: pipe_item
     label: "{{ pipe_item.key }}"
   with_dict: "{{ firewall_shaper_pipes }}"
-  register: created_pipes
+  register: firewall_created_pipes
 
 # create queues
 - name: Creating shaper queues
@@ -117,7 +117,7 @@
     loop_var: queue_item
     label: "{{ queue_item.key }}"
   with_dict: "{{ firewall_shaper_queues }}"
-  register: created_queues
+  register: firewall_created_queues
 
 # create rules
 - name: Creating shaper rules
@@ -147,10 +147,13 @@
     loop_var: rule_item
     label: "{{ rule_item.key }}"
   with_dict: "{{ firewall_shaper_rules }}"
-  register: created_rules
+  register: firewall_created_shaper_rules
 
 # reload everything
 - name: Reload shaper config
   oxlorg.opnsense.reload:
     target: "shaper"
-  when: created_pipes.changed or purged_pipes.changed or created_queues.changed or purged_queues.changed or created_rules.changed or purged_rules.changed
+  when: >-
+    firewall_created_pipes.changed or firewall_purged_pipes.changed or
+    firewall_created_queues.changed or firewall_purged_queues.changed or
+    firewall_created_shaper_rules.changed or firewall_purged_shaper_rules.changed

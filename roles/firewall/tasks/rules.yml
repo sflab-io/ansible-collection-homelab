@@ -2,11 +2,11 @@
 - name: Pulling existing rules
   oxlorg.opnsense.list:
     target: rule
-  register: existing_rules
+  register: firewall_existing_rules
 
 - name: Debug print existing rules
   ansible.builtin.debug:
-    var: existing_rules.data
+    var: firewall_existing_rules.data
 
 - name: Purging unconfigured rules
   # ansible.builtin.debug:
@@ -26,8 +26,8 @@
   loop_control:
     loop_var: existing_rule_item
     label: "{{ existing_rule_item.description }}"
-  with_items: "{{ existing_rules.data }}"
-  register: purged_rules
+  with_items: "{{ firewall_existing_rules.data }}"
+  register: firewall_purged_rules
 
 - name: Creating rules
   oxlorg.opnsense.rule:
@@ -64,9 +64,9 @@
     loop_var: rule_item
     label: "{{ rule_item.key }}"
   with_dict: "{{ firewall_rules }}"
-  register: created_rules
+  register: firewall_created_rules
 
 - name: Reload rules config
   oxlorg.opnsense.reload:
     target: "rule"
-  when: purged_rules.changed or created_rules.changed
+  when: firewall_purged_rules.changed or firewall_created_rules.changed

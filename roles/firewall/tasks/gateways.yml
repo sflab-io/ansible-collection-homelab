@@ -2,11 +2,11 @@
 - name: Pulling existing gateways
   oxlorg.opnsense.list:
     target: gateway
-  register: existing_gateways
+  register: firewall_existing_gateways
 
 # - name: Debug print existing gateways
 #   ansible.builtin.debug:
-#     var: existing_gateways.data
+#     var: firewall_existing_gateways.data
 
 - name: Purging unconfigured gateways
   # ansible.builtin.debug:
@@ -26,8 +26,8 @@
   loop_control:
     loop_var: existing_gateway_item
     label: "{{ existing_gateway_item.name }}"
-  with_items: "{{ existing_gateways.data }}"
-  register: purged_gateways
+  with_items: "{{ firewall_existing_gateways.data }}"
+  register: firewall_purged_gateways
 
 - name: Creating gateways
   oxlorg.opnsense.gateway:
@@ -59,12 +59,12 @@
     loop_var: gateway_item
     label: "{{ gateway_item.key }}"
   with_dict: "{{ firewall_gateways }}"
-  register: created_gateways
+  register: firewall_created_gateways
 
 - name: Reload gateway config
   oxlorg.opnsense.reload:
     target: "gateway"
-  when: purged_gateways.changed or created_gateways.changed
+  when: firewall_purged_gateways.changed or firewall_created_gateways.changed
 
 # Ask for configuring gateway groups manually
 - name: Ask for manual gateway group configuration
@@ -77,4 +77,4 @@
       AFTER your done configuring everything hit <ENTER>\n\
       otherwise use <CTRL-C> and <a> to abort the playbook run...\n\n\
       You might reboot the router now for rules to be configured correctly\n\n"
-  when: (purged_gateways.changed or created_gateways.changed) and firewall_gateway_groups | length > 0
+  when: (firewall_purged_gateways.changed or firewall_created_gateways.changed) and firewall_gateway_groups | length > 0
