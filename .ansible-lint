@@ -1,5 +1,0 @@
----
-# Ansible-lint configuration for sflab.homelab collection
-
-# Allow any variable naming patterns (collection uses mixed naming conventions)
-# Individual roles may override this with their own .ansible-lint files
