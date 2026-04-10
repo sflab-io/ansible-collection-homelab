@@ -2,5 +2,5 @@
 # defaults file for sflab.homelab.netbox_init
 
 # NetBox connection (override in inventory/group_vars)
-netbox_url: "http://127.0.0.1"
-# netbox_token: ""  # must be set in inventory, vault, or extra-vars
+netbox_init_url: "http://127.0.0.1"
+# netbox_init_token: ""  # must be set in inventory, vault, or extra-vars

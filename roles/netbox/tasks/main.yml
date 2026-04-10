@@ -1,9 +1,9 @@
 ---
 - name: Include task from postgresql.yml
-  include_tasks: postgres.yml
+  ansible.builtin.include_tasks: postgres.yml
 
 - name: Include task from redis.yml
-  include_tasks: redis.yml
+  ansible.builtin.include_tasks: redis.yml
 
 - name: Include task from install.yml
-  include_tasks: install.yml
+  ansible.builtin.include_tasks: install.yml
