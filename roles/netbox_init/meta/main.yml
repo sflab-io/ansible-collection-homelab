@@ -1,12 +1,12 @@
 ---
 galaxy_info:
-  author: foo
+  author: Sebastian Freund
   description: sflab.homelab netbox_init Role
   company: sflab
 
   license: MIT
 
-  min_ansible_version: "2.14"
+  min_ansible_version: "2.15"
 
   platforms:
     - name: Ubuntu

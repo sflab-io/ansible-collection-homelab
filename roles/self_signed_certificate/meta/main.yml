@@ -6,9 +6,9 @@ galaxy_info:
   description: |
     This role generates a self-signed TLS certificate with a CA.
 
-  license: Apache-2.0
+  license: MIT
 
-  min_ansible_version: "2.16"
+  min_ansible_version: "2.15"
 
   platforms:
     - name: Ubuntu

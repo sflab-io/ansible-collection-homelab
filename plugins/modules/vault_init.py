@@ -184,8 +184,6 @@ else:
 
             self.connection_options.process_connection_options()
             client_args: dict = self.connection_options.get_hvac_connection_options()
-            # TODO: make dynamic based on tls settings
-            client_args["verify"] = False
             self.client = self.helper.get_vault_client(**client_args)
 
         def get_defined_non_connection_params(self) -> dict:

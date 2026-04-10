@@ -1,7 +1,7 @@
 # Sflab Homelab Collection
 
 [![GitHub Release](https://img.shields.io/github/v/release/sflab-io/ansible-collection-homelab)](https://github.com/sflab-io/ansible-collection-homelab/releases)
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 This repository contains the `sflab.homelab` Ansible Collection for managing homelab infrastructure.
 
@@ -186,6 +186,6 @@ Releases are published at [GitHub Releases](https://github.com/sflab-io/ansible-
 
 ## Licensing
 
-GNU General Public License v3.0 or later.
+MIT License.
 
-See [LICENSE](https://www.gnu.org/licenses/gpl-3.0.txt) to see the full text.
+See [LICENSE](LICENSE) to see the full text.

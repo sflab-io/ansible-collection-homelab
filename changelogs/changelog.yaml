@@ -1,0 +1,50 @@
+ancestor: null
+releases:
+  0.1.0:
+    changes:
+      release_summary:
+        "This is the first release of the Sflab Homelab Collection,
+        a curated set of Ansible roles and playbooks designed to help you manage your
+        homelab infrastructure efficiently. \nThis release includes a variety of roles
+        for common homelab services, as well as playbooks to get you started quickly.\n"
+    fragments:
+      - 0.1.0.yaml
+    modules:
+      - description: Initializes a HashiCorp Vault instance.
+        name: vault_init
+        namespace: ""
+      - description: Configures a KV secret engine in HashiCorp Vault
+        name: vault_kv_secret_engine
+        namespace: ""
+      - description:
+          Generates an certificate signing request (CSR) for a PKI secret
+          engine
+        name: vault_pki_generate_intermediate_csr
+        namespace: ""
+      - description: Configures a PKI secret engine role in HashiCorp Vault
+        name: vault_pki_role
+        namespace: ""
+      - description: Configures a PKI root CA certificate in HashiCorp Vault
+        name: vault_pki_root_ca_certificate
+        namespace: ""
+      - description: Configures a PKI secret engine in HashiCorp Vault
+        name: vault_pki_secret_engine
+        namespace: ""
+      - description: Sets a signed intermediate CA certificate for a PKI secret engine
+        name: vault_pki_set_signed_intermediate
+        namespace: ""
+      - description:
+          Signs a certificate signing request as an intermediate CA in HashiCorp
+          Vault
+        name: vault_pki_sign_intermediate
+        namespace: ""
+      - description: Tunes configuration parameters for a HashiCorp Vault secrets engine
+        name: vault_secrets_tune
+        namespace: ""
+      - description: Unseals a HashiCorp Vault instance
+        name: vault_unseal
+        namespace: ""
+      - description: Execute a write operation in HashiCorp Vault
+        name: vault_write
+        namespace: ""
+    release_date: "2026-04-10"

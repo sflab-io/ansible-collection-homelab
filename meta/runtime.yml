@@ -1,2 +1,16 @@
 ---
 requires_ansible: ">=2.15.0"
+
+action_groups:
+  vault:
+    - vault_init
+    - vault_unseal
+    - vault_write
+    - vault_kv_secret_engine
+    - vault_pki_secret_engine
+    - vault_pki_root_ca_certificate
+    - vault_pki_generate_intermediate_csr
+    - vault_pki_sign_intermediate
+    - vault_pki_set_signed_intermediate
+    - vault_pki_role
+    - vault_secrets_tune

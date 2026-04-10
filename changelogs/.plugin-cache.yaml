@@ -1,0 +1,120 @@
+objects:
+  role:
+    common:
+      description: Argument specifications for sflab.homelab.common role
+      name: common
+      version_added: null
+    docker:
+      description:
+        Deploy Docker with reverse proxy (Traefik or Caddy) and Vault PKI
+        ACME integration.
+      name: docker
+      version_added: null
+    firewall:
+      description: Deploy and configure Firewall
+      name: firewall
+      version_added: null
+    netbox:
+      description: Deploy and configure Netbox server
+      name: netbox
+      version_added: null
+    netbox_init:
+      description: Deploy and configure Netbox server
+      name: netbox_init
+      version_added: null
+    pki:
+      description: Configure HashiCorp Vault PKI secret engine for certificate management
+      name: pki
+      version_added: null
+    self_signed_certificate:
+      description: Self-Signed Certificate with CA Role
+      name: self_signed_certificate
+      version_added: null
+    technitium:
+      description: Argument specifications for sflab.homelab.common role
+      name: technitium
+      version_added: null
+    vault:
+      description: Role description.
+      name: vault
+      version_added: null
+    vault_secrets:
+      description: Configure a KV-v2 secrets engine and AppRole in HashiCorp Vault.
+      name: vault_secrets
+      version_added: null
+plugins:
+  become: {}
+  cache: {}
+  callback: {}
+  cliconf: {}
+  connection: {}
+  filter: {}
+  httpapi: {}
+  inventory: {}
+  lookup: {}
+  module:
+    vault_init:
+      description: Initializes a HashiCorp Vault instance.
+      name: vault_init
+      namespace: ""
+      version_added: 0.1.0
+    vault_kv_secret_engine:
+      description: Configures a KV secret engine in HashiCorp Vault
+      name: vault_kv_secret_engine
+      namespace: ""
+      version_added: 0.1.0
+    vault_pki_generate_intermediate_csr:
+      description:
+        Generates an certificate signing request (CSR) for a PKI secret
+        engine
+      name: vault_pki_generate_intermediate_csr
+      namespace: ""
+      version_added: 0.1.0
+    vault_pki_role:
+      description: Configures a PKI secret engine role in HashiCorp Vault
+      name: vault_pki_role
+      namespace: ""
+      version_added: 0.1.0
+    vault_pki_root_ca_certificate:
+      description: Configures a PKI root CA certificate in HashiCorp Vault
+      name: vault_pki_root_ca_certificate
+      namespace: ""
+      version_added: 0.1.0
+    vault_pki_secret_engine:
+      description: Configures a PKI secret engine in HashiCorp Vault
+      name: vault_pki_secret_engine
+      namespace: ""
+      version_added: 0.1.0
+    vault_pki_set_signed_intermediate:
+      description: Sets a signed intermediate CA certificate for a PKI secret engine
+      name: vault_pki_set_signed_intermediate
+      namespace: ""
+      version_added: 0.1.0
+    vault_pki_sign_intermediate:
+      description:
+        Signs a certificate signing request as an intermediate CA in HashiCorp
+        Vault
+      name: vault_pki_sign_intermediate
+      namespace: ""
+      version_added: 0.1.0
+    vault_secrets_tune:
+      description: Tunes configuration parameters for a HashiCorp Vault secrets engine
+      name: vault_secrets_tune
+      namespace: ""
+      version_added: 0.1.0
+    vault_unseal:
+      description: Unseals a HashiCorp Vault instance
+      name: vault_unseal
+      namespace: ""
+      version_added: 0.1.0
+    vault_write:
+      description: Execute a write operation in HashiCorp Vault
+      name: vault_write
+      namespace: ""
+      version_added: 0.1.0
+  netconf: {}
+  shell: {}
+  strategy: {}
+  test: {}
+  vars: {}
+version: 0.1.0
