@@ -2,7 +2,7 @@
 - name: Update repositories cache and install "curl" package
   ansible.builtin.apt:
     name: curl
-    update_cache: yes
+    update_cache: true
 
 - name: Download Technitium DNS install script
   ansible.builtin.get_url:

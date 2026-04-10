@@ -2,3 +2,6 @@
 roles:
   - name: geerlingguy.docker
     src: geerlingguy.docker
+
+collections:
+  - name: effectivelywild.technitium_dns

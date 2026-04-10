@@ -52,14 +52,14 @@
       become: true
       ansible.builtin.stat:
         path: "{{ _listener.tls_cert_file }}"
-      register: _tls_cert_file
+      register: vault_tls_cert_file
 
     - name: Validate TLS certificate exists
       when:
         - _listener.tls_enabled | default(false)
       ansible.builtin.assert:
         that:
-          - _tls_cert_file.stat.exists
+          - vault_tls_cert_file.stat.exists
         fail_msg: The TLS certificate file does not exist.
         success_msg: The TLS certificate file exists.
 
@@ -78,14 +78,14 @@
       become: true
       ansible.builtin.stat:
         path: "{{ _listener.tls_key_file }}"
-      register: _tls_key_file
+      register: vault_tls_key_file
 
     - name: Validate TLS key exists
       when:
         - _listener.tls_enabled | default(false)
       ansible.builtin.assert:
         that:
-          - _tls_key_file.stat.exists
+          - vault_tls_key_file.stat.exists
         fail_msg: The TLS key file does not exist.
         success_msg: The TLS key file exists.
 
@@ -104,11 +104,11 @@
           become: true
           ansible.builtin.stat:
             path: "{{ _listener.tls_client_ca_file }}"
-          register: _tls_client_ca_file
+          register: vault_tls_client_ca_file
 
         - name: Validate TLS client CA certificate exists
           ansible.builtin.assert:
             that:
-              - _tls_client_ca_file.stat.exists
+              - vault_tls_client_ca_file.stat.exists
             fail_msg: The TLS client CA certificate file does not exist.
             success_msg: The TLS client CA certificate file exists.

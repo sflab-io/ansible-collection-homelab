@@ -59,13 +59,13 @@
   become: true
   ansible.builtin.stat:
     path: "{{ _raft_retry_join.leader_ca_cert_file }}"
-  register: _raft_retry_join_ca_cert_file
+  register: vault_raft_retry_join_ca_cert_file
   loop_control:
     loop_var: _raft_retry_join
     label: "{{ _raft_retry_join.leader_ca_cert_file }}"
 
 - name: Validate raft leader join TLS CA certificate exists
-  loop: "{{ _raft_retry_join_ca_cert_file.results }}"
+  loop: "{{ vault_raft_retry_join_ca_cert_file.results }}"
   ansible.builtin.assert:
     that:
       - _raft_retry_join.stat.exists
@@ -91,13 +91,13 @@
   become: true
   ansible.builtin.stat:
     path: "{{ _raft_retry_join.leader_client_cert_file }}"
-  register: _raft_retry_join_client_cert_file
+  register: vault_raft_retry_join_client_cert_file
   loop_control:
     loop_var: _raft_retry_join
     label: "{{ _raft_retry_join.leader_client_cert_file }}"
 
 - name: Validate raft leader join TLS client certificate exists
-  loop: "{{ _raft_retry_join_client_cert_file.results }}"
+  loop: "{{ vault_raft_retry_join_client_cert_file.results }}"
   ansible.builtin.assert:
     that:
       - _raft_retry_join.stat.exists
@@ -123,13 +123,13 @@
   become: true
   ansible.builtin.stat:
     path: "{{ _raft_retry_join.leader_client_key_file }}"
-  register: _raft_retry_join_client_key_file
+  register: vault_raft_retry_join_client_key_file
   loop_control:
     loop_var: _raft_retry_join
     label: "{{ _raft_retry_join.leader_client_key_file }}"
 
 - name: Validate raft leader join TLS client key exists
-  loop: "{{ _raft_retry_join_client_key_file.results }}"
+  loop: "{{ vault_raft_retry_join_client_key_file.results }}"
   ansible.builtin.assert:
     that:
       - _raft_retry_join.stat.exists

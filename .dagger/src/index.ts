@@ -17,6 +17,7 @@ import { dag, Container, Directory, object, func } from "@dagger.io/dagger"
 
 @object()
 export class AnsibleCollectionHomelab {
+
   /**
    * Returns a container that echoes whatever string argument is provided
    */

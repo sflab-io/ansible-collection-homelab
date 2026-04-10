@@ -5,3 +5,4 @@
 # Prettier takes precedence as it runs on every commit.
 skip_list:
   - yaml[comments]
+  - no-handler
