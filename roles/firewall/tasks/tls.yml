@@ -63,7 +63,7 @@
     description: DNS-01 validation via Bind nsupdate
     method: dns01
     dns_service: dns_nsupdate
-    dns_nsupdate_server: "{{ firewall_dns_nsupdate_server}}"
+    dns_nsupdate_server: "{{ firewall_dns_nsupdate_server }}"
     dns_nsupdate_zone: "{{ firewall_domain }}"
     dns_nsupdate_key: |
       key "ddnskey" {
@@ -78,7 +78,7 @@
   oxlorg.opnsense.unbound_host:
     hostname: vault
     domain: "{{ firewall_domain }}"
-    value: "{{ firewall_ip}}"
+    value: "{{ firewall_ip }}"
     state: present
 
 # 6. Apply DNS changes

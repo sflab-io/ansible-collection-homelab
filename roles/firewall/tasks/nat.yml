@@ -11,7 +11,7 @@
     state: "absent"
     match_fields: ["description"]
 
-  when: existing_outbound_id not in opnsense_nat_outbound
+  when: existing_outbound_id not in firewall_nat_outbound
 
   vars:
     existing_outbound_id: "{{ existing_outbound_item.description }}"
@@ -46,7 +46,7 @@
   loop_control:
     loop_var: outbound_item
     label: "{{ outbound_item.key }}"
-  with_dict: "{{ opnsense_nat_outbound }}"
+  with_dict: "{{ firewall_nat_outbound }}"
   register: created_outbounds
 
 - name: Reload NAT outbounds config

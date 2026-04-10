@@ -12,7 +12,7 @@
     state: "absent"
     reload: false
 
-  when: existing_rule_id not in opnsense_shaper_rules
+  when: existing_rule_id not in firewall_shaper_rules
 
   vars:
     existing_rule_id: "{{ existing_rule_item.description }}"
@@ -36,7 +36,7 @@
     state: "absent"
     reload: false
 
-  when: existing_queue_id not in opnsense_shaper_queues
+  when: existing_queue_id not in firewall_shaper_queues
 
   vars:
     existing_queue_id: "{{ existing_queue_item.description }}"
@@ -60,7 +60,7 @@
     state: "absent"
     reload: false
 
-  when: existing_pipe_id not in opnsense_shaper_pipes
+  when: existing_pipe_id not in firewall_shaper_pipes
 
   vars:
     existing_pipe_id: "{{ existing_pipe_item.description }}"
@@ -93,7 +93,7 @@
   loop_control:
     loop_var: pipe_item
     label: "{{ pipe_item.key }}"
-  with_dict: "{{ opnsense_shaper_pipes }}"
+  with_dict: "{{ firewall_shaper_pipes }}"
   register: created_pipes
 
 # create queues
@@ -116,7 +116,7 @@
   loop_control:
     loop_var: queue_item
     label: "{{ queue_item.key }}"
-  with_dict: "{{ opnsense_shaper_queues }}"
+  with_dict: "{{ firewall_shaper_queues }}"
   register: created_queues
 
 # create rules
@@ -146,7 +146,7 @@
   loop_control:
     loop_var: rule_item
     label: "{{ rule_item.key }}"
-  with_dict: "{{ opnsense_shaper_rules }}"
+  with_dict: "{{ firewall_shaper_rules }}"
   register: created_rules
 
 # reload everything

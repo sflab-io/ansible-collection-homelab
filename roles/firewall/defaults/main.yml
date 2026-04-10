@@ -11,31 +11,31 @@ firewall_dns_ddns_key_algorithm: "hmac-sha256"
 
 # ---
 # this is just printed as a helper after VLANs are configured to remember user for manual interfaces config
-opnsense_interfaces: []
+firewall_interfaces: []
 
 # this is just printed as a helper after gateways are configured to remember user for manual gateway group config
-opnsense_gateway_groups: []
+firewall_gateway_groups: []
 
-opnsense_vlans: {}
+firewall_vlans: {}
 
-opnsense_gateways: {}
+firewall_gateways: {}
 
-opnsense_dhcp: {}
+firewall_dhcp: {}
 
-opnsense_dhcp_subnets: {}
+firewall_dhcp_subnets: {}
 
-opnsense_dhcp_reservations: {}
+firewall_dhcp_reservations: {}
 
-opnsense_aliases: {}
+firewall_aliases: {}
 
-opnsense_nat_outbound: {}
+firewall_nat_outbound: {}
 
-opnsense_shaper_pipes: {}
+firewall_shaper_pipes: {}
 
-opnsense_shaper_queues: {}
+firewall_shaper_queues: {}
 
-opnsense_shaper_rules: {}
+firewall_shaper_rules: {}
 
-opnsense_rules: {}
+firewall_rules: {}
 
-opnsense_tailscale_advertised_routes: {}
+firewall_tailscale_advertised_routes: {}

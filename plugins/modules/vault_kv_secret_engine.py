@@ -165,8 +165,6 @@ import traceback
 
 
 try:
-    import hvac
-
     from hvac.exceptions import Forbidden
 except ImportError:
     HAS_HVAC = False

@@ -283,7 +283,7 @@ from ansible.module_utils.basic import missing_required_lib
 
 
 try:
-    import hvac
+    import hvac  # pylint: disable=unused-import
 except ImportError:
     HAS_HVAC: bool = False
     HVAC_IMPORT_ERROR: Optional[str] = traceback.format_exc()
@@ -466,10 +466,12 @@ def ensure_certificate_absent(
 
             for warning in warnings:
                 # Skip the warning about deleting all keys and issuers
-                if (
-                    warning
-                    != "DELETE /root deletes all keys and issuers; prefer the new DELETE /key/:key_ref and DELETE /issuer/:issuer_ref for finer granularity, unless removal of all keys and issuers is desired."
-                ):
+                delete_root_warning = (
+                    "DELETE /root deletes all keys and issuers; prefer the new DELETE /key/:key_ref"
+                    " and DELETE /issuer/:issuer_ref for finer granularity,"
+                    " unless removal of all keys and issuers is desired."
+                )
+                if warning != delete_root_warning:
                     module.warn(warning)
 
     return dict(changed=True, prev_certificate=certificate_data)

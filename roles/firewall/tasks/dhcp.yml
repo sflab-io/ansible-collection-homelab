@@ -21,10 +21,10 @@
 # dhcp controller management
 - name: Configure DHCP server
   oxlorg.opnsense.dhcp_general:
-    enabled: "{{ opnsense_dhcp.enabled | default(false) }}"
-    interfaces: "{{ opnsense_dhcp.interfaces | default(omit) }}"
-    fw_rules: "{{ opnsense_dhcp.auto_fw_rules | default(true) }}"
-    lifetime: "{{ opnsense_dhcp.lifetime | default(omit) }}"
+    enabled: "{{ firewall_dhcp.enabled | default(false) }}"
+    interfaces: "{{ firewall_dhcp.interfaces | default(omit) }}"
+    fw_rules: "{{ firewall_dhcp.auto_fw_rules | default(true) }}"
+    lifetime: "{{ firewall_dhcp.lifetime | default(omit) }}"
 
 # dhcp subnet management
 - name: Pulling existing DHCP subnets
@@ -44,7 +44,7 @@
     match_fields: ["subnet"]
     reload: false
 
-  when: existing_subnet_id not in opnsense_dhcp_subnets
+  when: existing_subnet_id not in firewall_dhcp_subnets
 
   vars:
     existing_subnet_id: "{{ existing_subnet_item.subnet }}"
@@ -86,7 +86,7 @@
   loop_control:
     loop_var: subnet_item
     label: "{{ subnet_item.key }}"
-  with_dict: "{{ opnsense_dhcp_subnets }}"
+  with_dict: "{{ firewall_dhcp_subnets }}"
   register: created_subnets
 
 # DHCP reservations management
@@ -103,7 +103,7 @@
     state: "absent"
     reload: false
 
-  when: existing_reservation_item.mac not in opnsense_dhcp_reservations
+  when: existing_reservation_item.mac not in firewall_dhcp_reservations
 
   loop_control:
     loop_var: existing_reservation_item
@@ -130,7 +130,7 @@
   loop_control:
     loop_var: reservation_item
     label: "{{ reservation_item.key }}"
-  with_dict: "{{ opnsense_dhcp_reservations }}"
+  with_dict: "{{ firewall_dhcp_reservations }}"
   register: created_reservations
 
 # A reload for everything

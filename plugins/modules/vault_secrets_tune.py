@@ -276,8 +276,6 @@ import traceback
 
 
 try:
-    import hvac
-
     from hvac.exceptions import Forbidden, InvalidRequest
 except ImportError:
     HAS_HVAC = False
@@ -286,7 +284,7 @@ else:
     HAS_HVAC = True
     HVAC_IMPORT_ERROR = None
 
-from typing import List, Optional
+from typing import List
 
 from ansible.module_utils.basic import missing_required_lib
 

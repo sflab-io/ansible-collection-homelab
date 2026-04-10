@@ -16,5 +16,6 @@ galaxy_info:
 
   galaxy_tags: []
 
-dependencies:
-  - geerlingguy.docker
+dependencies: []
+# Note: Docker must be installed before using this role.
+# Use geerlingguy.docker or any other Docker installation role.

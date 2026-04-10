@@ -143,7 +143,7 @@ import traceback
 
 
 try:
-    import hvac
+    import hvac  # pylint: disable=unused-import
 except ImportError:
     HAS_HVAC = False
     HVAC_IMPORT_ERROR = traceback.format_exc()

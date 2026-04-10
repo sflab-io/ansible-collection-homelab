@@ -54,7 +54,7 @@ from ansible.module_utils.basic import missing_required_lib
 
 
 try:
-    import hvac
+    import hvac  # pylint: disable=unused-import
 except ImportError:
     HAS_HVAC: bool = False
     HVAC_IMPORT_ERROR: Optional[str] = traceback.format_exc()

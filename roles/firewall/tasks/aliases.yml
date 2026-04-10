@@ -13,7 +13,7 @@
     state: "absent"
     reload: false
 
-  when: existing_alias_id not in opnsense_aliases
+  when: existing_alias_id not in firewall_aliases
 
   vars:
     existing_alias_id: "{{ existing_alias_item.name }}"
@@ -42,7 +42,7 @@
   loop_control:
     loop_var: alias_item
     label: "{{ alias_item.key }}"
-  with_dict: "{{ opnsense_aliases }}"
+  with_dict: "{{ firewall_aliases }}"
   register: created_aliases
 
 - name: Reload aliases config

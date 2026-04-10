@@ -18,7 +18,7 @@
     state: "absent"
     reload: false
 
-  when: existing_gateway_id not in opnsense_gateways
+  when: existing_gateway_id not in firewall_gateways
 
   vars:
     existing_gateway_id: "{{ existing_gateway_item.name }}"
@@ -58,7 +58,7 @@
   loop_control:
     loop_var: gateway_item
     label: "{{ gateway_item.key }}"
-  with_dict: "{{ opnsense_gateways }}"
+  with_dict: "{{ firewall_gateways }}"
   register: created_gateways
 
 - name: Reload gateway config
@@ -71,10 +71,10 @@
   ansible.builtin.pause:
     prompt: "\n\nYou now need to do the gateway group configuration by hand!\n\
       The current configuration advices the following groups:\n\n\
-      {{ opnsense_gateway_groups | community.general.to_prettytable }}\n\
+      {{ firewall_gateway_groups | community.general.to_prettytable }}\n\
       SET PURGED GATEWAYS TO NEVER\n\n\
       Now is also a good time to go to the outbound interfaceses and set the default router\n\n\
       AFTER your done configuring everything hit <ENTER>\n\
       otherwise use <CTRL-C> and <a> to abort the playbook run...\n\n\
       You might reboot the router now for rules to be configured correctly\n\n"
-  when: (purged_gateways.changed or created_gateways.changed) and opnsense_gateway_groups | length > 0
+  when: (purged_gateways.changed or created_gateways.changed) and firewall_gateway_groups | length > 0

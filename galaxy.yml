@@ -11,8 +11,6 @@ authors:
   - Sebastian Freund <abes140377@web.de>
 
 description: A collection of Ansible roles and plugins for managing a homelab environment.
-license:
-  - MIT
 license_file: LICENSE
 
 tags:

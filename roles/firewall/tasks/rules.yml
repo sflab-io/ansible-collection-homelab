@@ -18,7 +18,7 @@
     match_fields: ["description"]
     reload: false
 
-  when: existing_rule_id not in opnsense_rules
+  when: existing_rule_id not in firewall_rules
 
   vars:
     existing_rule_id: "{{ existing_rule_item.description }}"
@@ -63,7 +63,7 @@
   loop_control:
     loop_var: rule_item
     label: "{{ rule_item.key }}"
-  with_dict: "{{ opnsense_rules }}"
+  with_dict: "{{ firewall_rules }}"
   register: created_rules
 
 - name: Reload rules config

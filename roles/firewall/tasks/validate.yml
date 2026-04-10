@@ -2,104 +2,104 @@
 # Validating all used variables
 - name: Validate VLAN config
   ansible.utils.validate:
-    data: "{{ opnsense_vlans }}"
+    data: "{{ firewall_vlans }}"
     criteria:
-      - "{{ lookup('file',  '../criteria/opnsense_vlans.json') | from_json }}"
+      - "{{ lookup('file', '../criteria/firewall_vlans.json') | from_json }}"
     engine: ansible.utils.jsonschema
-  when: opnsense_vlans.keys() | length > 0
+  when: firewall_vlans.keys() | length > 0
 
 - name: Validate interfaces config
   ansible.utils.validate:
-    data: "{{ opnsense_interfaces }}"
+    data: "{{ firewall_interfaces }}"
     criteria:
-      - "{{ lookup('file',  '../criteria/opnsense_interfaces.json') | from_json }}"
+      - "{{ lookup('file', '../criteria/firewall_interfaces.json') | from_json }}"
     engine: ansible.utils.jsonschema
-  when: opnsense_vlans.keys() | length > 0
+  when: firewall_vlans.keys() | length > 0
 
 - name: Validate gateway config
   ansible.utils.validate:
-    data: "{{ opnsense_gateways }}"
+    data: "{{ firewall_gateways }}"
     criteria:
-      - "{{ lookup('file',  '../criteria/opnsense_gateways.json') | from_json }}"
+      - "{{ lookup('file', '../criteria/firewall_gateways.json') | from_json }}"
     engine: ansible.utils.jsonschema
-  when: opnsense_gateways.keys() | length > 0
+  when: firewall_gateways.keys() | length > 0
 
 - name: Validate gateway-groups config
   ansible.utils.validate:
-    data: "{{ opnsense_gateway_groups }}"
+    data: "{{ firewall_gateway_groups }}"
     criteria:
-      - "{{ lookup('file',  '../criteria/opnsense_gateway_groups.json') | from_json }}"
+      - "{{ lookup('file', '../criteria/firewall_gateway_groups.json') | from_json }}"
     engine: ansible.utils.jsonschema
-  when: opnsense_gateways.keys() | length > 0
+  when: firewall_gateways.keys() | length > 0
 
 - name: Validate dhcp controller config
   ansible.utils.validate:
-    data: "{{ opnsense_dhcp }}"
+    data: "{{ firewall_dhcp }}"
     criteria:
-      - "{{ lookup('file',  '../criteria/opnsense_dhcp.json') | from_json }}"
+      - "{{ lookup('file', '../criteria/firewall_dhcp.json') | from_json }}"
     engine: ansible.utils.jsonschema
-  when: opnsense_dhcp.keys() | length > 0
+  when: firewall_dhcp.keys() | length > 0
 
 - name: Validate dhcp subnets config
   ansible.utils.validate:
-    data: "{{ opnsense_dhcp_subnets }}"
+    data: "{{ firewall_dhcp_subnets }}"
     criteria:
-      - "{{ lookup('file',  '../criteria/opnsense_dhcp_subnets.json') | from_json }}"
+      - "{{ lookup('file', '../criteria/firewall_dhcp_subnets.json') | from_json }}"
     engine: ansible.utils.jsonschema
-  when: opnsense_dhcp.keys() | length > 0
+  when: firewall_dhcp.keys() | length > 0
 
 - name: Validate dhcp reservations config
   ansible.utils.validate:
-    data: "{{ opnsense_dhcp_reservations }}"
+    data: "{{ firewall_dhcp_reservations }}"
     criteria:
-      - "{{ lookup('file',  '../criteria/opnsense_dhcp_reservations.json') | from_json }}"
+      - "{{ lookup('file', '../criteria/firewall_dhcp_reservations.json') | from_json }}"
     engine: ansible.utils.jsonschema
-  when: opnsense_dhcp.keys() | length > 0
+  when: firewall_dhcp.keys() | length > 0
 
 - name: Validate aliases config
   ansible.utils.validate:
-    data: "{{ opnsense_aliases }}"
+    data: "{{ firewall_aliases }}"
     criteria:
-      - "{{ lookup('file',  '../criteria/opnsense_aliases.json') | from_json }}"
+      - "{{ lookup('file', '../criteria/firewall_aliases.json') | from_json }}"
     engine: ansible.utils.jsonschema
-  when: opnsense_aliases.keys() | length > 0
+  when: firewall_aliases.keys() | length > 0
 
 - name: Validate NAT config
   ansible.utils.validate:
-    data: "{{ opnsense_nat_outbound }}"
+    data: "{{ firewall_nat_outbound }}"
     criteria:
-      - "{{ lookup('file',  '../criteria/opnsense_nat_outbound.json') | from_json }}"
+      - "{{ lookup('file', '../criteria/firewall_nat_outbound.json') | from_json }}"
     engine: ansible.utils.jsonschema
-  when: opnsense_nat_outbound.keys() | length > 0
+  when: firewall_nat_outbound.keys() | length > 0
 
 - name: Validate shaper pipes config
   ansible.utils.validate:
-    data: "{{ opnsense_shaper_pipes }}"
+    data: "{{ firewall_shaper_pipes }}"
     criteria:
-      - "{{ lookup('file',  '../criteria/opnsense_shaper_pipes.json') | from_json }}"
+      - "{{ lookup('file', '../criteria/firewall_shaper_pipes.json') | from_json }}"
     engine: ansible.utils.jsonschema
-  when: opnsense_shaper_pipes.keys() | length > 0
+  when: firewall_shaper_pipes.keys() | length > 0
 
 - name: Validate shaper queues config
   ansible.utils.validate:
-    data: "{{ opnsense_shaper_queues }}"
+    data: "{{ firewall_shaper_queues }}"
     criteria:
-      - "{{ lookup('file',  '../criteria/opnsense_shaper_queues.json') | from_json }}"
+      - "{{ lookup('file', '../criteria/firewall_shaper_queues.json') | from_json }}"
     engine: ansible.utils.jsonschema
-  when: opnsense_shaper_pipes.keys() | length > 0
+  when: firewall_shaper_pipes.keys() | length > 0
 
 - name: Validate shaper rules config
   ansible.utils.validate:
-    data: "{{ opnsense_shaper_rules }}"
+    data: "{{ firewall_shaper_rules }}"
     criteria:
-      - "{{ lookup('file',  '../criteria/opnsense_shaper_rules.json') | from_json }}"
+      - "{{ lookup('file', '../criteria/firewall_shaper_rules.json') | from_json }}"
     engine: ansible.utils.jsonschema
-  when: opnsense_shaper_pipes.keys() | length > 0
+  when: firewall_shaper_pipes.keys() | length > 0
 
 - name: Validate rules config
   ansible.utils.validate:
-    data: "{{ opnsense_rules }}"
+    data: "{{ firewall_rules }}"
     criteria:
-      - "{{ lookup('file',  '../criteria/opnsense_rules.json') | from_json }}"
+      - "{{ lookup('file', '../criteria/firewall_rules.json') | from_json }}"
     engine: ansible.utils.jsonschema
-  when: opnsense_rules.keys() | length > 0
+  when: firewall_rules.keys() | length > 0
