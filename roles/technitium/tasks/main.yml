@@ -1,25 +1,26 @@
 ---
-- import_tasks: install.yml
+- name: Install Technitium DNS
+  ansible.builtin.import_tasks: install.yml
 
 - name: Login and get session token
   effectivelywild.technitium_dns.technitium_dns_login:
     api_url: "{{ technitium_api_url }}"
     username: "{{ technitium_username }}"
     password: "{{ technitium_password }}"
-  register: login_result
+  register: technitium_login_result
 
 - name: Display session token
   ansible.builtin.debug:
-    var: login_result.token
+    var: technitium_login_result.token
 
 - name: Configure primary DNS
-  import_tasks: config_primary.yml
+  ansible.builtin.import_tasks: config_primary.yml
   when: inventory_hostname in groups['dns_primary_servers']
 
 - name: Configure secondary DNS
-  import_tasks: config_secondary.yml
+  ansible.builtin.import_tasks: config_secondary.yml
   when: inventory_hostname in groups['dns_secondary_servers']
 
 - name: Initialize primary DNS
-  import_tasks: init_primary.yml
+  ansible.builtin.import_tasks: init_primary.yml
   when: inventory_hostname in groups['dns_primary_servers']

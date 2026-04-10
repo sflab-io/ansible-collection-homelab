@@ -2,7 +2,7 @@
 - name: Join cluster with self-signed certificate on primary
   effectivelywild.technitium_dns.technitium_dns_init_join_cluster:
     api_url: "{{ technitium_api_url }}"
-    api_token: "{{ login_result.token }}"
+    api_token: "{{ technitium_login_result.token }}"
     secondary_node_ip_addresses:
       - "{{ ansible_host }}"
     primary_node_url: "https://pi1.{{ domain }}:53443/"

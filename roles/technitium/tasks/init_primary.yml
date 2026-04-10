@@ -2,7 +2,7 @@
 - name: Add A records
   effectivelywild.technitium_dns.technitium_dns_add_record:
     api_url: "{{ technitium_api_url }}"
-    api_token: "{{ login_result.token }}"
+    api_token: "{{ technitium_login_result.token }}"
     name: "{{ item.name }}.{{ domain }}"
     type: "A"
     ipAddress: "{{ item.ipAddress }}"

@@ -2,7 +2,7 @@
 - name: Initialize a new DNS cluster with single IP
   effectivelywild.technitium_dns.technitium_dns_init_cluster:
     api_url: "{{ technitium_api_url }}"
-    api_token: "{{ login_result.token }}"
+    api_token: "{{ technitium_login_result.token }}"
     cluster_domain: "{{ domain }}"
     primary_node_ip_addresses:
       - "{{ ansible_host }}"
@@ -15,7 +15,7 @@
 - name: Set server settings with TSIG keys
   effectivelywild.technitium_dns.technitium_dns_set_server_settings:
     api_url: "{{ technitium_api_url }}"
-    api_token: "{{ login_result.token }}"
+    api_token: "{{ technitium_login_result.token }}"
     tsigKeys:
       - keyName: "cluster-catalog.{{ domain }}"
         algorithmName: "{{ technitium_tsig_algorithm_name }}"
@@ -32,7 +32,7 @@
 - name: Set update security policies for primary zone
   effectivelywild.technitium_dns.technitium_dns_set_zone_options:
     api_url: "{{ technitium_api_url }}"
-    api_token: "{{ login_result.token }}"
+    api_token: "{{ technitium_login_result.token }}"
     zone: "{{ domain }}"
     queryAccess: "Allow"
     zoneTransfer: "Allow"
