@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
 
+#MISE description="Run Ansible linting via Dagger (containerized)"
+
+#MISE raw=true
+
 dagger -m github.com/tsirysndr/daggerverse/ansible-lint@aacb54a0750d69469200106cff81809c2cc6fafa \
     call lint --src .

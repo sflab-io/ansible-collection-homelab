@@ -10,8 +10,8 @@
     ignore_certificate_errors: true
     primary_node_username: "{{ technitium_username }}"
     primary_node_password: "{{ technitium_password }}"
-  register: join_cluster_result
+  register: technitium_join_cluster_result
 
 - name: Display cluster initialization result
   ansible.builtin.debug:
-    var: join_cluster_result
+    var: technitium_join_cluster_result

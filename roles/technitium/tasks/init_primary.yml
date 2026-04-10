@@ -9,10 +9,17 @@
     ttl: 3600
     validate_certs: false
   loop:
-    - { name: "opnsense", ipAddress: "192.168.1.1" }
-    - { name: "switch", ipAddress: "192.168.1.10" }
-    - { name: "ap", ipAddress: "192.168.1.11" }
-    - { name: "proxmox", ipAddress: "192.168.1.12" }
-    - { name: "minio", ipAddress: "192.168.1.20" }
-    - { name: "speedport", ipAddress: "192.168.178.1" }
-    - { name: "truenas", ipAddress: "192.168.30.108" }
+    - name: opnsense
+      ipAddress: "192.168.1.1"
+    - name: switch
+      ipAddress: "192.168.1.10"
+    - name: ap
+      ipAddress: "192.168.1.11"
+    - name: proxmox
+      ipAddress: "192.168.1.12"
+    - name: minio
+      ipAddress: "192.168.1.20"
+    - name: speedport
+      ipAddress: "192.168.178.1"
+    - name: truenas
+      ipAddress: "192.168.30.108"

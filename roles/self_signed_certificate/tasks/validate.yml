@@ -17,19 +17,19 @@
 - name: Validate OS is supported
   ansible.builtin.assert:
     that:
-      - _cert_os_is_supported
+      - self_signed_certificate_cert_os_is_supported
     fail_msg: "{{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_version'] }} is not supported."
     success_msg: "{{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_version'] }} is from a supported OS family."
 
 - name: Indicate OS is tested
   when:
-    - _cert_os_is_tested
+    - self_signed_certificate_cert_os_is_tested
   ansible.builtin.debug:
     msg: "{{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_version'] }} has been tested with this role."
 
 - name: Warn if OS is not tested
   when:
-    - not _cert_os_is_tested
+    - not self_signed_certificate_cert_os_is_tested
   ansible.builtin.debug:
     msg: "WARNING: {{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_version'] }} is not tested."
   changed_when: true

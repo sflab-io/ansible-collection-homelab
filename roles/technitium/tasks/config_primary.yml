@@ -6,11 +6,11 @@
     cluster_domain: "{{ domain }}"
     primary_node_ip_addresses:
       - "{{ ansible_host }}"
-  register: init_cluster_result
+  register: technitium_init_cluster_result
 
 - name: Display cluster initialization result
   ansible.builtin.debug:
-    var: init_cluster_result
+    var: technitium_init_cluster_result
 
 - name: Set server settings with TSIG keys
   effectivelywild.technitium_dns.technitium_dns_set_server_settings:
@@ -23,11 +23,11 @@
       - keyName: "{{ technitium_tsig_key_name }}"
         algorithmName: "{{ technitium_tsig_algorithm_name }}"
         sharedSecret: "{{ technitium_tsig_key_secret }}"
-  register: tsig_settings_result
+  register: technitium_tsig_settings_result
 
 - name: Display TSIG settings result
   ansible.builtin.debug:
-    var: tsig_settings_result
+    var: technitium_tsig_settings_result
 
 - name: Set update security policies for primary zone
   effectivelywild.technitium_dns.technitium_dns_set_zone_options:
@@ -47,8 +47,8 @@
         domain: "*.{{ domain }}"
         allowedTypes:
           - "ANY"
-  register: tsig_settings_result
+  register: technitium_zone_options_result
 
 - name: Display cluster initialization result
   ansible.builtin.debug:
-    var: tsig_settings_result
+    var: technitium_zone_options_result
