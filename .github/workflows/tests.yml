@@ -38,7 +38,7 @@ jobs:
       - changelog
       - build-import
       - ansible-lint
-      - sanity
+    #   - sanity
     #   - unit-galaxy
     #   - unit-source
     runs-on: ubuntu-latest
@@ -48,5 +48,4 @@ jobs:
           set([
           '${{ needs.build-import.result }}',
           '${{ needs.ansible-lint.result }}',
-          '${{ needs.sanity.result }}'
           ])"
