@@ -1,0 +1,26 @@
+---
+# argument spec file for sflab.homelab.docker
+
+argument_specs:
+  main:
+    short_description: Deploy Docker with reverse proxy (Traefik or Caddy) and Vault PKI ACME integration.
+    options:
+      docker_reverse_proxy_type:
+        type: str
+        description: Type of reverse proxy to deploy (traefik or caddy).
+        default: "caddy"
+        choices:
+          - traefik
+          - caddy
+      docker_domain:
+        type: str
+        description: Domain name for the reverse proxy.
+        default: "docker.{{ domain }}"
+      docker_vault_acme_endpoint:
+        type: str
+        description: Vault PKI ACME directory endpoint URL.
+        default: "http://vault.{{ domain }}:8200/v1/pki_intermediate/acme/directory"
+      docker_acme_email:
+        type: str
+        description: Email address for ACME registration.
+        default: "acme@{{ domain }}"

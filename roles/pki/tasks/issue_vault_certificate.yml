@@ -1,0 +1,141 @@
+---
+#
+# This task file issues a TLS certificate for Vault from the intermediate CA.
+#
+# Prerequisites:
+# - __pki_vault_init_data fact must be set (loaded via load_vault_init_data.yml)
+# - Intermediate CA PKI secret engine must be configured
+# - PKI role must exist (configured via create_pki_roles.yml)
+#
+
+- name: Debug variables
+  ansible.builtin.debug:
+    msg: |
+      Configuring Vault TLS certificate with the following parameters:
+        __pki_vault_url: {{ __pki_vault_url }}
+        vault_certificate_path: {{ vault_certificate_path }}
+        vault_certificate_key_path: {{ vault_certificate_key_path }}
+        vault_certificate_fullchain_path: {{ vault_certificate_fullchain_path }}
+        pki_vault_certificate_renewal_days: {{ pki_vault_certificate_renewal_days }}
+        pki_intermediate_mount_point: {{ pki_intermediate_mount_point }}
+        pki_vault_certificate_role_30: {{ pki_vault_certificate_role_30 }}
+        pki_vault_certificate_common_name: {{ pki_vault_certificate_common_name }}
+        pki_vault_certificate_alt_names: {{ pki_vault_certificate_alt_names }}
+        pki_vault_certificate_ip_sans: {{ pki_vault_certificate_ip_sans }}
+        pki_vault_certificate_ttl_30: {{ pki_vault_certificate_ttl_30 }}
+
+- name: Create TLS directory for Vault certificates
+  become: true
+  ansible.builtin.file:
+    path: "{{ vault_tls_directory }}"
+    state: "directory"
+    owner: "vault"
+    group: "vault"
+    mode: "0755"
+
+- name: Check if Vault certificate exists
+  ansible.builtin.stat:
+    path: "{{ vault_certificate_path }}"
+  register: __pki_vault_cert_stat
+
+- name: Get certificate info if exists
+  when: __pki_vault_cert_stat.stat.exists
+  community.crypto.x509_certificate_info:
+    path: "{{ vault_certificate_path }}"
+  register: __pki_vault_cert_info
+
+- name: Debug print __pki_vault_cert_info
+  when: __pki_vault_cert_info is defined
+  ansible.builtin.debug:
+    var: __pki_vault_cert_info
+
+- name: Get issuer from __pki_vault_cert_info
+  when: __pki_vault_cert_info is defined
+  ansible.builtin.set_fact:
+    __pki_vault_cert_issuer: "{{ __pki_vault_cert_info.issuer.commonName }}"
+
+- name: Calculate certificate expiration time
+  when: __pki_vault_cert_stat.stat.exists
+  ansible.builtin.set_fact:
+    __pki_vault_cert_days_remaining: "{{ ((__pki_vault_cert_info.not_after | to_datetime('%Y%m%d%H%M%SZ')) - (ansible_facts['date_time'].iso8601 | to_datetime('%Y-%m-%dT%H:%M:%SZ'))).days }}"
+
+- name: Determine if certificate renewal is needed
+  ansible.builtin.set_fact:
+    __pki_vault_cert_needs_renewal: "{{ __pki_vault_cert_issuer != pki_intermediate_common_name or not __pki_vault_cert_stat.stat.exists or (__pki_vault_cert_days_remaining | default(0) | int) < (pki_vault_certificate_renewal_days | int) }}"
+
+- name: Display certificate renewal status
+  ansible.builtin.debug:
+    msg: |
+      Certificate renewal check:
+        Certificate exists: {{ __pki_vault_cert_stat.stat.exists }}
+        Days remaining: {{ __pki_vault_cert_days_remaining | default('N/A') }}
+        Issuer: {{ __pki_vault_cert_issuer | default('N/A') }}
+        Renewal threshold: {{ pki_vault_certificate_renewal_days }} days
+        Needs renewal: {{ __pki_vault_cert_needs_renewal }}
+
+- name: Issue TLS certificate
+  when: __pki_vault_cert_needs_renewal | bool
+  block:
+    - name: Issue certificate from intermediate CA
+      sflab.homelab.vault_write:
+        url: "{{ __pki_vault_url }}"
+        auth_method: "token"
+        token: "{{ __pki_vault_init_data.root_token }}"
+        path: "{{ pki_intermediate_mount_point }}/issue/{{ pki_vault_certificate_role_30 }}"
+        data:
+          common_name: "{{ pki_vault_certificate_common_name }}"
+          alt_names: "{{ pki_vault_certificate_alt_names | join(',') }}"
+          ip_sans: "{{ pki_vault_certificate_ip_sans | join(',') }}"
+          ttl: "{{ pki_vault_certificate_ttl_30 }}"
+      register: __pki_vault_cert_response
+      no_log: true
+
+    - name: Write certificate to file
+      when:
+        - __pki_vault_cert_response is defined
+        - __pki_vault_cert_response.response is defined
+      ansible.builtin.copy:
+        content: "{{ __pki_vault_cert_response.response.data.certificate }}"
+        dest: "{{ vault_certificate_path }}"
+        owner: "vault"
+        group: "vault"
+        mode: "0644"
+      # notify: Restart vault
+
+    - name: Write private key to file
+      when:
+        - __pki_vault_cert_response is defined
+        - __pki_vault_cert_response.response is defined
+      ansible.builtin.copy:
+        content: "{{ __pki_vault_cert_response.response.data.private_key }}"
+        dest: "{{ vault_certificate_key_path }}"
+        owner: "vault"
+        group: "vault"
+        mode: "0600"
+      no_log: true
+      # notify: Restart vault
+
+    - name: Write fullchain certificate to file
+      when:
+        - __pki_vault_cert_response is defined
+        - __pki_vault_cert_response.response is defined
+      ansible.builtin.copy:
+        content: "{{ __pki_vault_cert_response.response.data.certificate }}\n{{ __pki_vault_cert_response.response.data.issuing_ca }}"
+        dest: "{{ vault_certificate_fullchain_path }}"
+        owner: "vault"
+        group: "vault"
+        mode: "0644"
+
+    - name: Display certificate information
+      when:
+        - __pki_vault_cert_response is defined
+        - __pki_vault_cert_response.response is defined
+      ansible.builtin.debug:
+        msg: |
+          Vault TLS certificate issued successfully:
+            Common Name: {{ pki_vault_certificate_common_name }}
+            Certificate Path: {{ vault_certificate_path }}
+            Key Path: {{ vault_certificate_key_path }}
+            Fullchain Path: {{ vault_certificate_fullchain_path }}
+            Serial Number: {{ __pki_vault_cert_response.response.data.serial_number }}
+            TTL: {{ pki_vault_certificate_ttl_30 }}

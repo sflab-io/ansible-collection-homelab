@@ -1,0 +1,64 @@
+---
+# {{ ansible_managed }}
+# Docker Compose configuration for Portainer container management UI
+#
+# This configuration deploys Portainer CE (Community Edition) behind Traefik reverse proxy
+# with automatic TLS certificate management via HashiCorp Vault PKI ACME.
+#
+# Portainer Configuration:
+# - Web UI: Accessible via subdomain routing
+# - Persistent data: Stored in named volume for container state persistence
+# - Docker socket: Mounted for container management capabilities
+#
+# Routing configured (subdomain):
+# - https://portainer.{{ docker_domain }} -> Portainer web UI
+
+services:
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - proxy
+    environment:
+      # Timezone for proper log timestamps
+      - TZ=Europe/Berlin
+    volumes:
+      # Docker socket access for container management
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      # Persistent data storage for Portainer configuration and state
+      - portainer_data:/data
+      # add system store to make sflab-root-ca.crt and sflab-intermediate-ca.crt available in docker container
+      - /etc/ssl/certs:/etc/ssl/certs:ro
+    labels:
+      # Enable Traefik for this service
+      - "traefik.enable=true"
+
+      # Routing configuration (subdomain)
+      # Access via: https://portainer.{{ docker_domain }}
+      - "traefik.http.routers.portainer.rule=Host(`portainer.{{ docker_domain }}`)"
+      - "traefik.http.routers.portainer.entrypoints=websecure"
+      - "traefik.http.routers.portainer.tls=true"
+      # Request TLS certificate from Vault PKI via ACME
+      - "traefik.http.routers.portainer.tls.certresolver=vault"
+
+      # Apply middlewares: add security headers
+      # Subdomain routing requires no path manipulation
+      - "traefik.http.routers.portainer.middlewares=secure-headers"
+
+      # Service configuration (Portainer listens on port 9000 by default)
+      - "traefik.http.services.portainer.loadbalancer.server.port=9000"
+
+# Networks
+networks:
+  # Use the existing proxy network created by Traefik
+  proxy:
+    external: true
+
+# Volumes
+volumes:
+  # Persistent storage for Portainer data
+  portainer_data:
+    name: portainer_data

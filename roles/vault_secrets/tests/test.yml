@@ -1,0 +1,17 @@
+---
+- name: Test vault_secrets role
+  hosts: vault_servers
+  become: true
+  gather_facts: true
+
+  roles:
+    - role: sflab.homelab.vault_secrets
+      vars:
+        vault_secrets_engine_name: "secrets_homelab"
+        vault_secrets_approle_name: "approle_secrets_homelab"
+        vault_secrets_policy_name: "policy_secrets_homelab"
+        vault_secrets_output_file: "/etc/vault.d/vault-secrets-approle.json"
+        vault_secrets_init_data_file: "/etc/vault.d/vault-init-data.json"
+        vault_secrets_api_protocol: "https"
+        vault_secrets_api_port: 8200
+        vault_secrets_validate_certs: false

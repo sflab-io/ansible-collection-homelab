@@ -1,0 +1,43 @@
+---
+#
+# This task file loads Vault initialization data and extracts the root token.
+#
+# Sets the following facts:
+# - __pki_vault_init_data: Complete init data structure
+# - __pki_vault_init_data.root_token: The Vault root token
+#
+# Prerequisites:
+# - Vault must be initialized (handled by vault role)
+# - Variable pki_vault_init_data_file must be defined
+#
+
+- name: Check if Vault init data file exists
+  ansible.builtin.stat:
+    path: "{{ pki_vault_init_data_file }}"
+  register: __pki_vault_init_data_stat
+
+- name: Fail if Vault init data file does not exist
+  ansible.builtin.fail:
+    msg: |
+      Vault init data file not found at {{ pki_vault_init_data_file }}.
+      This file should be created by the vault role during initialization.
+      Ensure the vault role has run successfully before the pki role.
+  when: not __pki_vault_init_data_stat.stat.exists
+
+- name: Load Vault init data from file
+  ansible.builtin.slurp:
+    src: "{{ pki_vault_init_data_file }}"
+  register: __pki_vault_init_data_content
+  no_log: true # Contains sensitive root token
+
+- name: Parse Vault init data
+  ansible.builtin.set_fact:
+    __pki_vault_init_data: "{{ __pki_vault_init_data_content.content | b64decode | from_json }}"
+  no_log: true # Contains sensitive root token
+
+- name: Verify root token exists in init data
+  ansible.builtin.fail:
+    msg: |
+      Root token not found in Vault init data file {{ pki_vault_init_data_file }}.
+      The file may be corrupted or incomplete.
+  when: __pki_vault_init_data.root_token is not defined or __pki_vault_init_data.root_token == ""

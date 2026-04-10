@@ -1,0 +1,20 @@
+---
+- name: Include task from role geerlingguy.postgresql
+  include_role:
+    name: geerlingguy.postgresql
+  vars:
+    postgresql_databases:
+      - name: netbox
+    postgresql_users:
+      - name: netbox
+        password: netbox
+    postgresql_privs:
+      - db: netbox
+        roles: netbox
+        type: database
+        privs: ALL
+      - db: netbox
+        roles: netbox
+        type: schema
+        objs: public
+        privs: CREATE

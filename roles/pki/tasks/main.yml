@@ -1,0 +1,28 @@
+---
+- name: Load Vault initialization data
+  ansible.builtin.import_tasks: load_vault_init_data.yml
+
+- name: Configure PKI secret engine for Root CA
+  ansible.builtin.import_tasks: configure_secret_engine_root_ca.yml
+
+- name: Generate the Root CA certificate
+  ansible.builtin.import_tasks: generate_root_ca_certificate.yml
+
+- name: Configure PKI secret engine for Intermediate CA
+  ansible.builtin.import_tasks: configure_secret_engine_intermediate_ca.yml
+
+- name: Generate the Intermediate CA certificate
+  ansible.builtin.import_tasks: generate_intermediate_ca_certificate.yml
+
+- name: Sign intermediate CSR with root CA
+  ansible.builtin.import_tasks: sign_intermediate_csr.yml
+
+- name: Create roles for issuing certificates
+  ansible.builtin.import_tasks: create_pki_roles.yml
+
+- name: Configure ACME support
+  ansible.builtin.import_tasks: configure_acme_support.yml
+
+- name: Issue TLS certificate for Vault from Intermediate CA
+  when: pki_vault_certificate_enabled | default(false)
+  ansible.builtin.import_tasks: issue_vault_certificate.yml

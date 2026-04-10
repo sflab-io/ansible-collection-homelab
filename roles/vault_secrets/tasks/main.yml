@@ -1,0 +1,18 @@
+---
+- name: Validate
+  ansible.builtin.import_tasks: validate/main.yml
+
+- name: Load Vault init data
+  ansible.builtin.import_tasks: load_vault_init_data.yml
+
+- name: Configure secrets engine
+  ansible.builtin.import_tasks: configure_secrets_engine.yml
+
+- name: Configure policy
+  ansible.builtin.import_tasks: configure_policy.yml
+
+- name: Configure AppRole
+  ansible.builtin.import_tasks: configure_approle.yml
+
+- name: Output AppRole credentials
+  ansible.builtin.import_tasks: output_approle_credentials.yml

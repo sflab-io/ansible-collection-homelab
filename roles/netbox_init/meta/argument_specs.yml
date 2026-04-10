@@ -1,0 +1,14 @@
+---
+# argument spec file for sflab.homelab.netbox_init
+
+argument_specs:
+  main:
+    short_description: Deploy and configure Netbox server
+    # options:
+    #   docker_reverse_proxy_type:
+    #     type: str
+    #     description: Type of reverse proxy to deploy (traefik or caddy).
+    #     default: "caddy"
+    #     choices:
+    #       - traefik
+    #       - caddy

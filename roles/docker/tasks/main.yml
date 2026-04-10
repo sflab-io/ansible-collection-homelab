@@ -1,0 +1,8 @@
+---
+- name: Include task to deploy traefik configuration
+  ansible.builtin.include_tasks: traefik.yml
+  when: docker_deploy_traefik | bool
+
+- name: Include task to deploy portainer
+  ansible.builtin.include_tasks: portainer.yml
+  when: docker_deploy_portainer | bool

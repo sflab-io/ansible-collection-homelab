@@ -1,0 +1,47 @@
+---
+# argument spec file for sflab.homelab.common
+
+argument_specs:
+  main:
+    short_description: "Argument specifications for sflab.homelab.common role"
+    options:
+      common_hostname:
+        type: str
+        description: "Hostname to set on the target machine"
+        required: false
+        default: "{{ ansible_host }}"
+      common_domain:
+        type: str
+        description: "Domain name to use for the homelab environment"
+        required: false
+        default: "home.sflab.io"
+      common_add_vault_certificates_to_trust_store:
+        type: bool
+        description: "Whether to add Vault CA certificates to the system trust store"
+        required: false
+        default: true
+      common_vault_pki_url:
+        type: str
+        description: "Base URL of the HashiCorp Vault server"
+        required: false
+        default: "https://vault.{{ common_domain }}:8200"
+      common_vault_pki_mount:
+        type: str
+        description: "PKI secrets engine mount path in Vault"
+        required: false
+        default: "pki_root"
+      common_vault_pki_intermediate_mount:
+        type: str
+        description: "Intermediate PKI secrets engine mount path in Vault"
+        required: false
+        default: "pki_intermediate"
+      common_root_ca_cert_name:
+        type: str
+        description: "Filename (without extension) for the root CA certificate in the system trust store"
+        required: false
+        default: "sflab-root-ca"
+      common_intermediate_ca_cert_name:
+        type: str
+        description: "Filename (without extension) for the intermediate CA certificate in the system trust store"
+        required: false
+        default: "sflab-intermediate-ca"

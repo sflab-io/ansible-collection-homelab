@@ -1,0 +1,46 @@
+---
+# netbox_config must be set via set_fact (not vars: in include_role) so that
+# gmazoyer.netbox can extend it with SECRET_KEY via its own set_fact.
+# include_role vars: have precedence #20 which overrides set_fact (#19),
+# preventing the external role from updating netbox_config with SECRET_KEY.
+- name: Set base Netbox configuration
+  ansible.builtin.set_fact:
+    netbox_config:
+      ALLOWED_HOSTS:
+        - "{{ ansible_host }}"
+        - 127.0.0.1
+      TIME_ZONE: "Europe/Berlin"
+      LANGUAGE_CODE: "en-us"
+    netbox_setup_web_frontend: true
+
+# Run migrations before the external role to handle cases where configuration
+# exists but migrations have not been applied (e.g. config was previously broken).
+# gmazoyer.netbox only runs migrations when git detects a code change.
+# This task is idempotent - when no pending migrations it completes quickly.
+- name: Check if Netbox configuration exists
+  ansible.builtin.stat:
+    path: "{{ netbox_install_directory | default('/opt/netbox') }}/netbox/netbox/configuration.py"
+  register: __netbox_config_stat
+
+- name: Perform database migration
+  community.general.django_manage:
+    app_path: "{{ netbox_install_directory | default('/opt/netbox') }}/netbox"
+    command: migrate
+    virtualenv: "{{ netbox_virtualenv_path | default('/opt/netbox/venv') }}"
+  become: true
+  become_user: "{{ netbox_user | default('netbox') }}"
+  when: __netbox_config_stat.stat.exists
+
+- name: Collect static files
+  community.general.django_manage:
+    app_path: "{{ netbox_install_directory | default('/opt/netbox') }}/netbox"
+    command: collectstatic
+    clear: true
+    virtualenv: "{{ netbox_virtualenv_path | default('/opt/netbox/venv') }}"
+  become: true
+  become_user: "{{ netbox_user | default('netbox') }}"
+  when: __netbox_config_stat.stat.exists
+
+- name: Include task from role gmazoyer.netbox
+  ansible.builtin.include_role:
+    name: gmazoyer.netbox

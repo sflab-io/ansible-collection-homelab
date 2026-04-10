@@ -1,0 +1,54 @@
+---
+- name: Initialize a new DNS cluster with single IP
+  effectivelywild.technitium_dns.technitium_dns_init_cluster:
+    api_url: "{{ technitium_api_url }}"
+    api_token: "{{ login_result.token }}"
+    cluster_domain: "{{ domain }}"
+    primary_node_ip_addresses:
+      - "{{ ansible_host }}"
+  register: init_cluster_result
+
+- name: Display cluster initialization result
+  ansible.builtin.debug:
+    var: init_cluster_result
+
+- name: Set server settings with TSIG keys
+  effectivelywild.technitium_dns.technitium_dns_set_server_settings:
+    api_url: "{{ technitium_api_url }}"
+    api_token: "{{ login_result.token }}"
+    tsigKeys:
+      - keyName: "cluster-catalog.{{ domain }}"
+        algorithmName: "{{ technitium_tsig_algorithm_name }}"
+        sharedSecret: "{{ technitium_tsig_key_secret }}"
+      - keyName: "{{ technitium_tsig_key_name }}"
+        algorithmName: "{{ technitium_tsig_algorithm_name }}"
+        sharedSecret: "{{ technitium_tsig_key_secret }}"
+  register: tsig_settings_result
+
+- name: Display TSIG settings result
+  ansible.builtin.debug:
+    var: tsig_settings_result
+
+- name: Set update security policies for primary zone
+  effectivelywild.technitium_dns.technitium_dns_set_zone_options:
+    api_url: "{{ technitium_api_url }}"
+    api_token: "{{ login_result.token }}"
+    zone: "{{ domain }}"
+    queryAccess: "Allow"
+    zoneTransfer: "Allow"
+    update: "Allow"
+    updateSecurityPolicies:
+      - tsigKeyName: "{{ technitium_tsig_key_name }}"
+        domain: "{{ domain }}"
+        allowedTypes:
+          - "A"
+          - "AAAA"
+      - tsigKeyName: "{{ technitium_tsig_key_name }}"
+        domain: "*.{{ domain }}"
+        allowedTypes:
+          - "ANY"
+  register: tsig_settings_result
+
+- name: Display cluster initialization result
+  ansible.builtin.debug:
+    var: tsig_settings_result

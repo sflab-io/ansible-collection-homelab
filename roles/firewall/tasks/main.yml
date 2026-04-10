@@ -1,0 +1,40 @@
+---
+- name: Include task validate.yml
+  include_tasks: validate.yml
+
+# including required tasks
+- name: Include VLAN management
+  include_tasks: vlans.yml
+  when: opnsense_vlans.keys() | length > 0
+
+- name: Include gateway management
+  include_tasks: gateways.yml
+  when: opnsense_gateways.keys() | length > 0
+
+# # - name: Include tailscale management
+# #   include_tasks: tailscale.yml
+# #   when: opnsense_tailscale_advertised_routes | length > 0
+
+- name: Include dhcp management
+  include_tasks: dhcp.yml
+  when: opnsense_dhcp.keys() | length > 0
+
+- name: include alias management
+  include_tasks: aliases.yml
+  when: opnsense_aliases.keys() | length > 0
+
+- name: include NAT management
+  include_tasks: nat.yml
+  when: opnsense_nat_outbound.keys() | length > 0
+
+- name: include shaper management
+  include_tasks: shaper.yml
+  when: opnsense_shaper_pipes.keys() | length > 0
+
+- name: include rule management
+  include_tasks: rules.yml
+  when: opnsense_rules.keys() | length > 0
+# ---
+
+# - name: Include task from tls
+#   include_tasks: tls.yml

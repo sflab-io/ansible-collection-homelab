@@ -1,0 +1,59 @@
+---
+#
+# This task file generates the intermediate CA certificate in Vault.
+#
+# Prerequisites:
+# - __pki_vault_init_data fact must be set (loaded via load_vault_init_data.yml)
+# - Root CA PKI secret engine must be enabled
+#
+
+# - name: Debug variables
+#   ansible.builtin.debug:
+#     msg: |
+#       Configuring PKI Intermediate CA with the following parameters:
+#         __pki_vault_url: {{ __pki_vault_url }}
+#         pki_intermediate_mount_point: {{ pki_intermediate_mount_point }}
+#         pki_intermediate_common_name: {{ pki_intermediate_common_name }}
+
+- name: Generate intermediate CA CSR
+  sflab.homelab.vault_pki_generate_intermediate_csr:
+    url: "{{ __pki_vault_url }}"
+    auth_method: "token"
+    token: "{{ __pki_vault_init_data.root_token }}"
+    engine_mount_point: "{{ pki_intermediate_mount_point }}"
+    common_name: "{{ pki_intermediate_common_name }}"
+    type: internal # or 'existing' if you want to use an existing key
+  register: __pki_intermediate_csr
+
+# - name: Display PKI intermediate CSR generation status
+#   ansible.builtin.debug:
+#     msg: |
+#       PKI Intermediate CSR Generation Status:
+#         Changed: {{ __pki_intermediate_csr.changed }}
+#   when: __pki_intermediate_csr is defined
+
+- name: Configure PKI intermediate cluster path
+  sflab.homelab.vault_write:
+    url: "{{ __pki_vault_url }}"
+    auth_method: "token"
+    token: "{{ __pki_vault_init_data.root_token }}"
+    path: "{{ pki_intermediate_mount_point }}/config/cluster"
+    data:
+      path: "{{ __pki_vault_url }}/v1/{{ pki_intermediate_mount_point }}"
+      aia_path: "{{ __pki_vault_url }}/v1/{{ pki_intermediate_mount_point }}"
+
+- name: Configure PKI intermediate URLs with templating
+  sflab.homelab.vault_write:
+    url: "{{ __pki_vault_url }}"
+    auth_method: "token"
+    token: "{{ __pki_vault_init_data.root_token }}"
+    path: "{{ pki_intermediate_mount_point }}/config/urls"
+    data:
+      # Use templated URLs for issuing certificates, CRL distribution points, and OCSP servers
+      # The {{issuer_id}} and {{cluster_path}} variables will be replaced by Vault at runtime
+      # The expressions surrounding the variables are escaped to prevent Ansible from interpreting them
+      issuing_certificates: "{% raw %}{{cluster_aia_path}}/issuer/{{issuer_id}}/der{% endraw %}"
+      crl_distribution_points: "{% raw %}{{cluster_aia_path}}/issuer/{{issuer_id}}/crl/der{% endraw %}"
+      ocsp_servers: "{% raw %}{{cluster_path}}/ocsp{% endraw %}"
+      enable_templating: true
+  no_log: true # Token in parameters

@@ -1,0 +1,9 @@
+---
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
+
+- name: Enable and start HashiCorp Vault
+  ansible.builtin.systemd_service:
+    name: vault.service
+    enabled: true
+    state: started

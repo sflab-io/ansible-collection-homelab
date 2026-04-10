@@ -1,0 +1,15 @@
+---
+- name: Download and dearmor HashiCorp GPG key # noqa command-instead-of-module risky-shell-pipe
+  become: true
+  ansible.builtin.shell:
+    cmd: |
+      wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+    creates: /usr/share/keyrings/hashicorp-archive-keyring.gpg
+
+- name: Add HashiCorp APT repository
+  become: true
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com {{ ansible_facts['distribution_release'] }} main"
+    filename: hashicorp
+    update_cache: true
+    state: present

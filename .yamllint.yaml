@@ -1,0 +1,15 @@
+---
+extends: default
+rules:
+  line-length:
+    max: 180
+  truthy:
+    allowed-values: ["true", "false"]
+    check-keys: false
+  document-start: disable
+  comments-indentation: disable
+ignore: |
+  vendor/
+  .dagger/
+  .creds.env.yaml
+  .kubeconform.yaml

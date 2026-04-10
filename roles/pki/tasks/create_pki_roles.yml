@@ -1,0 +1,74 @@
+---
+#
+# This task file creates PKI roles in Vault.
+#
+# Prerequisites:
+# - __pki_vault_init_data fact must be set (loaded via load_vault_init_data.yml)
+# - Root CA PKI secret engine must be enabled
+#
+
+# - name: Debug variables
+#   ansible.builtin.debug:
+#     msg: |
+#       Configuring PKI Intermediate CA with the following parameters:
+#         __pki_vault_url: {{ __pki_vault_url }}
+#         pki_intermediate_mount_point: {{ pki_intermediate_mount_point }}
+#         pki_vault_certificate_role_30: {{ pki_vault_certificate_role_30 }}
+#         pki_vault_certificate_ttl_30: {{ pki_vault_certificate_ttl_30 }}
+#         pki_vault_domain: {{ pki_vault_domain }}
+
+- name: Creates a PKI role for {{ pki_vault_certificate_ttl_30 }} certificates
+  sflab.homelab.vault_pki_role:
+    url: "{{ __pki_vault_url }}"
+    auth_method: "token"
+    token: "{{ __pki_vault_init_data.root_token }}"
+    engine_mount_point: "{{ pki_intermediate_mount_point }}"
+    name: "{{ pki_vault_certificate_role_30 }}"
+    max_ttl: "{{ pki_vault_certificate_ttl_30 }}" # 30 days
+    allowed_domains:
+      - "{{ pki_vault_domain }}"
+    allow_subdomains: true
+    require_cn: false # cert-manager sendet CSRs ohne CN (Common Name), da moderne TLS-Zertifikate SAN verwenden
+    state: present
+
+- name: Creates a PKI role for 90-day certificates
+  sflab.homelab.vault_pki_role:
+    url: "{{ __pki_vault_url }}"
+    auth_method: "token"
+    token: "{{ __pki_vault_init_data.root_token }}"
+    engine_mount_point: "{{ pki_intermediate_mount_point }}"
+    name: "{{ pki_vault_certificate_role_90 }}"
+    max_ttl: "{{ pki_vault_certificate_ttl_90 }}" # 90 days
+    allowed_domains:
+      - "{{ pki_vault_domain }}"
+    allow_subdomains: true
+    require_cn: false # cert-manager sendet CSRs ohne CN (Common Name), da moderne TLS-Zertifikate SAN verwenden
+    state: present
+
+- name: Creates a PKI role for 365-day certificates
+  sflab.homelab.vault_pki_role:
+    url: "{{ __pki_vault_url }}"
+    auth_method: "token"
+    token: "{{ __pki_vault_init_data.root_token }}"
+    engine_mount_point: "{{ pki_intermediate_mount_point }}"
+    name: "{{ pki_vault_certificate_role_365 }}"
+    max_ttl: "{{ pki_vault_certificate_ttl_365 }}" # 365 days
+    allowed_domains:
+      - "{{ pki_vault_domain }}"
+    allow_subdomains: true
+    require_cn: false # cert-manager sendet CSRs ohne CN (Common Name), da moderne TLS-Zertifikate SAN verwenden
+    state: present
+
+- name: Creates a PKI role for 10-years certificates
+  sflab.homelab.vault_pki_role:
+    url: "{{ __pki_vault_url }}"
+    auth_method: "token"
+    token: "{{ __pki_vault_init_data.root_token }}"
+    engine_mount_point: "{{ pki_intermediate_mount_point }}"
+    name: "{{ pki_vault_certificate_role_3650 }}"
+    max_ttl: "{{ pki_vault_certificate_ttl_3650 }}" # 10 years
+    allowed_domains:
+      - "{{ pki_vault_domain }}"
+    allow_subdomains: true
+    require_cn: false # cert-manager sendet CSRs ohne CN (Common Name), da moderne TLS-Zertifikate SAN verwenden
+    state: present

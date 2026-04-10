@@ -1,0 +1,52 @@
+---
+- name: Set hostname
+  ansible.builtin.hostname:
+    name: "{{ common_hostname }}"
+
+- name: Disable cloud-init manage_etc_hosts
+  ansible.builtin.lineinfile:
+    path: /etc/cloud/cloud.cfg
+    regexp: "^manage_etc_hosts:"
+    line: "manage_etc_hosts: false"
+    state: present
+    create: false
+
+- name: Get current IP address
+  ansible.builtin.set_fact:
+    __vault_current_ip: "{{ ansible_facts['default_ipv4']['address'] }}"
+
+- name: Update /etc/hosts with correct IP address
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    regexp: '^127\.0\.1\.1\s+{{ ansible_facts["fqdn"] }}'
+    line: "{{ __vault_current_ip }} {{ ansible_facts['fqdn'] }} {{ ansible_facts['hostname'] }}"
+    state: present
+
+- name: Remove localhost entry for FQDN if it exists
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    regexp: '^127\.0\.0\.1\s+{{ ansible_facts["fqdn"] }}'
+    state: absent
+
+- name: Add vault certificates to system trust store
+  when: common_add_vault_certificates_to_trust_store
+  block:
+    - name: Download Vault root CA certificate
+      ansible.builtin.get_url:
+        url: "{{ common_vault_pki_url }}/v1/{{ common_vault_pki_mount }}/ca/pem"
+        dest: "/usr/local/share/ca-certificates/{{ common_root_ca_cert_name }}.crt"
+        validate_certs: false
+        owner: root
+        group: root
+        mode: "0644"
+      notify: Update system CA trust store
+
+    - name: Download Vault intermediate CA certificate
+      ansible.builtin.get_url:
+        url: "{{ common_vault_pki_url }}/v1/{{ common_vault_pki_intermediate_mount }}/ca/pem"
+        dest: "/usr/local/share/ca-certificates/{{ common_intermediate_ca_cert_name }}.crt"
+        validate_certs: false
+        owner: root
+        group: root
+        mode: "0644"
+      notify: Update system CA trust store

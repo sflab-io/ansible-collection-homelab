@@ -1,0 +1,74 @@
+---
+# This collection is initialized by https://github.com/ansible/ansible-creator 25.11.0
+
+# See https://docs.ansible.com/ansible/latest/dev_guide/collections_galaxy_meta.html
+
+namespace: "sflab"
+name: "homelab"
+version: 0.1.0
+readme: README.md
+authors:
+  - Sebastian Freund <abes140377@web.de>
+
+description: A collection of Ansible roles and plugins for managing a homelab environment.
+license_file: LICENSE
+
+tags:
+  [
+    "vault",
+    "hashicorp",
+    "pki",
+    "homelab",
+    "infrastructure",
+    "netbox",
+    "docker",
+    "dns",
+  ]
+dependencies:
+  "ansible.utils": "*"
+  "community.crypto": "*"
+  "community.general": "*"
+  "community.hashi_vault": "*"
+  "netbox.netbox": "*"
+
+repository: https://github.com/sflab-io/ansible-collection-homelab
+documentation: https://github.com/sflab-io/ansible-collection-homelab/tree/main/docs
+homepage: https://github.com/sflab-io/ansible-collection-homelab
+issues: https://github.com/sflab-io/ansible-collection-homelab/issues
+
+# A list of file glob-like patterns used to filter any files or directories that should not be included in the build
+# artifact. A pattern is matched from the relative path of the file or directory of the collection directory. This
+# uses 'fnmatch' to match the files or directories. Some directories and files like 'galaxy.yml', '*.pyc', '*.retry',
+# and '.git' are always filtered. Mutually exclusive with 'manifest'
+build_ignore:
+  - .gitignore
+  - .github/
+  - .dagger/
+  - .daggerignore
+  - dagger.json
+  - .mise/
+  - mise.toml
+  - .venv/
+  - .pre-commit-config.yaml
+  - .prettierignore
+  - .isort.cfg
+  - .yamllint.yaml
+  - .vscode/
+  - .ansible/
+  - .prompts/
+  - dist/
+  - tests/
+  - extensions/
+  - pyproject.toml
+  - test-requirements.txt
+  - tox-ansible.ini
+  - devfile.yaml
+  - CLAUDE.md
+  - AGENTS.md
+  - changelogs/.plugin-cache.yaml
+# A dict controlling use of manifest directives used in building the collection artifact. The key 'directives' is a
+# list of MANIFEST.in style
+# L(directives,https://packaging.python.org/en/latest/guides/using-manifest-in/#manifest-in-commands). The key
+# 'omit_default_directives' is a boolean that controls whether the default directives are used. Mutually exclusive
+# with 'build_ignore'
+# manifest: null

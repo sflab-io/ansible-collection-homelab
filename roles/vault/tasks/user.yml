@@ -1,0 +1,18 @@
+---
+- name: Create group
+  ansible.builtin.group:
+    name: "{{ vault_group }}"
+    system: true
+    state: present
+
+- name: Create user
+  ansible.builtin.user:
+    name: "{{ vault_user }}"
+    group: "{{ vault_group }}"
+    home: "{{ vault_home_directory }}"
+    create_home: true
+    password: "!"
+    password_lock: true
+    shell: /usr/sbin/nologin
+    system: true
+    state: present

@@ -1,0 +1,48 @@
+---
+#
+# This task file loads Vault initialization data and extracts the root token.
+#
+# Sets the following facts:
+# - __vault_secrets_init_data: Complete init data structure
+# - __vault_secrets_init_data.root_token: The Vault root token
+# - __vault_secrets_url: The base URL for the Vault API
+#
+# Prerequisites:
+# - Vault must be initialized (handled by vault role)
+# - Variable vault_secrets_init_data_file must be defined
+#
+
+- name: Check if Vault init data file exists
+  ansible.builtin.stat:
+    path: "{{ vault_secrets_init_data_file }}"
+  register: __vault_secrets_init_data_stat
+
+- name: Fail if Vault init data file does not exist
+  ansible.builtin.fail:
+    msg: |
+      Vault init data file not found at {{ vault_secrets_init_data_file }}.
+      This file should be created by the vault role during initialization.
+      Ensure the vault role has run successfully before the vault_secrets role.
+  when: not __vault_secrets_init_data_stat.stat.exists
+
+- name: Load Vault init data from file
+  ansible.builtin.slurp:
+    src: "{{ vault_secrets_init_data_file }}"
+  register: __vault_secrets_init_data_content
+  no_log: true
+
+- name: Parse Vault init data
+  ansible.builtin.set_fact:
+    __vault_secrets_init_data: "{{ __vault_secrets_init_data_content.content | b64decode | from_json }}"
+  no_log: true
+
+- name: Verify root token exists in init data
+  ansible.builtin.fail:
+    msg: |
+      Root token not found in Vault init data file {{ vault_secrets_init_data_file }}.
+      The file may be corrupted or incomplete.
+  when: __vault_secrets_init_data.root_token is not defined or __vault_secrets_init_data.root_token == ""
+
+- name: Set Vault API URL fact
+  ansible.builtin.set_fact:
+    __vault_secrets_url: "{{ vault_secrets_api_protocol }}://{{ vault_secrets_api_host }}:{{ vault_secrets_api_port }}"

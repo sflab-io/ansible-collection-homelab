@@ -1,0 +1,67 @@
+---
+- name: Check if domain certificate and key already exist
+  ansible.builtin.stat:
+    path: "{{ item }}"
+  loop:
+    - "{{ vault_tls_directory }}/{{ cert_common_name }}.key"
+    - "{{ vault_tls_directory }}/{{ cert_common_name }}.crt"
+  register: __cert_files
+
+# Generate domain key, CSR and self-signed certificate (using own CA)
+- name: Generate domain key, CSR and self-signed certificate (using own CA)
+  when: (__cert_files.results | selectattr('stat.exists', 'equalto', false) | list | length) > 0
+  block:
+    - name: Generate host/internal domain private key
+      community.crypto.openssl_privatekey:
+        path: "{{ vault_tls_directory }}/{{ cert_common_name }}.key"
+        owner: "{{ cert_vault_user }}"
+        group: "{{ cert_vault_group }}"
+
+    - name: Generate host/internal domain CSR
+      community.crypto.openssl_csr:
+        path: "{{ vault_tls_directory }}/{{ cert_common_name }}.csr"
+        privatekey_path: "{{ vault_tls_directory }}/{{ cert_common_name }}.key"
+        common_name: "{{ cert_common_name }}"
+        organization_name: "{{ cert_organization_name }}"
+        subject_alt_name: "{{ cert_subject_alt_name }}"
+        owner: "{{ cert_vault_user }}"
+        group: "{{ cert_vault_group }}"
+
+    - name: Generate host/internal domain certificate (with own self-signed CA)
+      community.crypto.x509_certificate:
+        path: "{{ vault_tls_directory }}/{{ cert_common_name }}.hostonly.crt"
+        csr_path: "{{ vault_tls_directory }}/{{ cert_common_name }}.csr"
+        ownca_path: "{{ vault_tls_directory }}/ca.crt"
+        ownca_privatekey_path: "{{ vault_tls_directory }}/ca.key"
+        ownca_not_after: "{{ cert_ownca_not_after }}"
+        provider: ownca
+        owner: "{{ cert_vault_user }}"
+        group: "{{ cert_vault_group }}"
+
+    # This is the certificate for actual deployment, with full chain of trust
+    # https://www.digicert.com/ssl-support/pem-ssl-creation.htm
+    - name: Read hostonly certificate
+      ansible.builtin.slurp:
+        src: "{{ vault_tls_directory }}/{{ cert_common_name }}.hostonly.crt"
+      register: __hostonly_cert
+
+    - name: Read CA certificate
+      ansible.builtin.slurp:
+        src: "{{ vault_tls_directory }}/ca.crt"
+      register: __ca_cert
+
+    - name: Generate host/internal domain certificate (with own self-signed CA) - with full chain of trust
+      ansible.builtin.copy:
+        content: "{{ (__hostonly_cert.content | b64decode) }}{{ (__ca_cert.content | b64decode) }}"
+        dest: "{{ vault_tls_directory }}/{{ cert_common_name }}.crt"
+        mode: "0644"
+        owner: "{{ cert_vault_user }}"
+        group: "{{ cert_vault_group }}"
+
+    - name: Clean up intermediate files
+      file:
+        path: "{{ item }}"
+        state: absent
+      with_items:
+        - "{{ vault_tls_directory }}/{{ cert_common_name }}.hostonly.crt"
+        - "{{ vault_tls_directory }}/{{ cert_common_name }}.csr"

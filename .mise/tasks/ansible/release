@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+#MISE description="Release the Ansible collection by building it and creating a GitHub release with the built archive"
+#MISE depends=["ansible:build"]
+
+set -euo pipefail
+
+# Read metadata from galaxy.yml
+VERSION=$(grep "^version:" "${MISE_CONFIG_ROOT}/galaxy.yml" | awk '{print $2}')
+NAMESPACE=$(grep "^namespace:" "${MISE_CONFIG_ROOT}/galaxy.yml" | awk '{print $2}' | tr -d '"')
+NAME=$(grep "^name:" "${MISE_CONFIG_ROOT}/galaxy.yml" | awk '{print $2}' | tr -d '"')
+TAG="v${VERSION}"
+ARCHIVE="${NAMESPACE}-${NAME}-${VERSION}.tar.gz"
+
+echo "Creating GitHub release ${TAG}..."
+
+export GITHUB_TOKEN=$(gh auth token)
+
+dagger \
+    -m github.com/stuttgart-things/dagger/ansible@v0.84.0 \
+    call github-release \
+    --tag "${TAG}" \
+    --title "Release ${TAG}" \
+    --group sflab-io \
+    --repo ansible-collection-homelab \
+    --files "${MISE_CONFIG_ROOT}/dist/${ARCHIVE}" \
+    --notes "Release ${TAG} of ${NAMESPACE}.${NAME} Ansible collection" \
+    --token env:GITHUB_TOKEN

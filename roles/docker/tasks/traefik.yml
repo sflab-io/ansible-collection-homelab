@@ -1,0 +1,27 @@
+---
+- name: Create required directories for Docker compose
+  ansible.builtin.file:
+    path: "/home/{{ ansible_user }}/docker"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0755"
+
+- name: Copy Traefik docker-compose-traefik.yml file
+  ansible.builtin.template:
+    src: docker-compose-traefik.yml.j2
+    dest: /home/{{ ansible_user }}/docker/docker-compose-traefik.yml
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0644"
+
+- name: Create and start service
+  community.docker.docker_compose_v2:
+    project_src: docker
+    files: "/home/{{ ansible_user }}/docker/docker-compose-traefik.yml"
+  register: docker_output
+
+- name: Show results only if verbose mode is enabled
+  when: ansible_verbosity > 0
+  ansible.builtin.debug:
+    var: docker_output

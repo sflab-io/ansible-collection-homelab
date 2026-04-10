@@ -1,0 +1,7 @@
+---
+# handlers file for sflab.homelab.common
+
+- name: Update system CA trust store
+  ansible.builtin.command:
+    cmd: update-ca-certificates
+  changed_when: true

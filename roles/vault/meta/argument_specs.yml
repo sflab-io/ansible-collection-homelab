@@ -1,0 +1,321 @@
+---
+# argument spec file for sflab.homelab.vault
+
+argument_specs:
+  main:
+    short_description: Role description.
+    options:
+      vault_cluster_name:
+        type: str
+        description: Name of the Vault cluster when clustering is enabled.
+        required: true
+      vault_api_protocol:
+        type: str
+        required: false
+        default: "http"
+        description:
+          - Protocol to use for Vault API connections (http or https).
+          - Set to "https" after TLS certificate is issued and Vault is configured for TLS.
+          - Must match the vault role's listener configuration.
+      vault_api_host:
+        type: str
+        required: false
+        default: "{{ ansible_facts['default_ipv4']['address'] }}"
+        description:
+          - The IP address or FQDN the Vault API will advertise to the cluster.
+          - "Reference: https://developer.hashicorp.com/vault/docs/configuration#api_addr"
+      vault_api_port:
+        type: int
+        required: false
+        default: 8200
+        description:
+          - The port on which the Vault API will listen.
+          - "Reference: https://developer.hashicorp.com/vault/docs/configuration#api_addr"
+      vault_cluster_port:
+        type: int
+        required: false
+        default: 8201
+        description:
+          - The port on which the Vault cluster will communicate.
+          - "Reference: https://developer.hashicorp.com/vault/docs/configuration#cluster_addr"
+      vault_tcp_listeners:
+        type: list
+        required: true
+        elements: dict
+        description:
+          - The TCP listeners for the Vault service.
+          - "Reference: https://developer.hashicorp.com/vault/docs/configuration/listener/tcp"
+        options:
+          address:
+            type: str
+            required: true
+            description:
+              - The IP address on which the Vault service will listen.
+              - "Reference: https://developer.hashicorp.com/vault/docs/configuration/listener/tcp#address"
+          port:
+            type: int
+            required: false
+            default: 8200
+            description:
+              - The port on which the Vault service will listen.
+              - "Reference: https://developer.hashicorp.com/vault/docs/configuration/listener/tcp#address"
+          cluster_address:
+            type: str
+            required: false
+            description:
+              - The IP address over which the Vault cluster will communicate.
+              - "Reference: https://developer.hashicorp.com/vault/docs/configuration/listener/tcp#cluster_address"
+          cluster_port:
+            type: int
+            required: false
+            default: 8201
+            description:
+              - The port over which the Vault cluster will communicate.
+              - "Reference: https://developer.hashicorp.com/vault/docs/configuration/listener/tcp#cluster_address"
+          http_idle_timeout:
+            type: str
+            required: false
+            default: 5m
+            description:
+              - The idle timeout for HTTP connections.
+              - If set to `0`, the timeout is disabled.
+              - "Reference: https://developer.hashicorp.com/vault/docs/configuration/listener/tcp#http_idle_timeout"
+          http_read_header_timeout:
+            type: str
+            required: false
+            default: 10s
+            description:
+              - The timeout for reading the request header.
+              - If set to `0`, the timeout is disabled.
+              - "Reference: https://developer.hashicorp.com/vault/docs/configuration/listener/tcp#http_read_header_timeout"
+          http_read_timeout:
+            type: str
+            required: false
+            default: 30s
+            description:
+              - The timeout for reading the request body.
+              - If set to `0`, the timeout is disabled.
+              - "Reference: https://developer.hashicorp.com/vault/docs/configuration/listener/tcp#http_read_timeout"
+          http_write_timeout:
+            type: str
+            required: false
+            default: "0"
+            description:
+              - The timeout for writing the response.
+              - If set to `0`, the timeout is disabled.
+              - "Reference: https://developer.hashicorp.com/vault/docs/configuration/listener/tcp#http_write_timeout"
+          max_request_size:
+            type: str
+            required: false
+            default: "33554432"
+            description:
+              - The maximum request size in bytes.
+              - "Reference: https://developer.hashicorp.com/vault/docs/configuration/listener/tcp#max_request_size"
+          max_request_duration:
+            type: str
+            required: false
+            default: 90s
+            description:
+              - The maximum request duration.
+              - "Reference: https://developer.hashicorp.com/vault/docs/configuration/listener/tcp#max_request_duration"
+          redact_addresses:
+            type: bool
+            required: false
+            default: false
+            description:
+              - Whether to react to the client address.
+              - "Reference: https://developer.hashicorp.com/vault/docs/configuration/listener/tcp#react_addresses"
+          redact_cluster_name:
+            type: bool
+            required: false
+            default: false
+            description:
+              - Whether to redact the cluster name.
+              - "Reference: https://developer.hashicorp.com/vault/docs/configuration/listener/tcp#redact_cluster_name"
+          redact_version:
+            type: bool
+            required: false
+            default: false
+            description:
+              - Whether to redact the version.
+              - "Reference: https://developer.hashicorp.com/vault/docs/configuration/listener/tcp#redact_version"
+          proxy_protocol_behavior:
+            type: str
+            required: false
+            choices:
+              - use_always
+              - allow_authorized
+              - deny_unauthorized
+            description:
+              - The behavior for handling the PROXY protocol.
+              - "Reference: https://developer.hashicorp.com/vault/docs/configuration/listener/tcp#proxy_protocol_behavior"
+          proxy_protocol_authorized_addrs:
+            type: list
+            required: false
+            elements: str
+            description:
+              - The list of authorized addresses for the PROXY protocol.
+              - "Reference: https://developer.hashicorp.com/vault/docs/configuration/listener/tcp#proxy_protocol_authorized_addrs"
+          tls_enabled:
+            type: bool
+            required: false
+            default: false
+            description:
+              - Whether to enable TLS.
+              - "Reference: https://developer.hashicorp.com/vault/docs/configuration/listener/tcp#tls_disable"
+          tls_cert_file:
+            type: path
+            required: false
+            description:
+              - The path to the certificate file.
+              - If *tls_enabled* is set to `true`, this is required.
+              - "Reference: https://developer.hashicorp.com/vault/docs/configuration/listener/tcp#tls_cert_file"
+          tls_key_file:
+            type: path
+            required: false
+            description:
+              - The path to the key file.
+              - If *tls_enabled* is set to `true`, this is required.
+              - "Reference: https://developer.hashicorp.com/vault/docs/configuration/listener/tcp#tls_key_file"
+          tls_min_version:
+            type: str
+            required: false
+            default: tls12
+            choices:
+              - tls10
+              - tls11
+              - tls12
+              - tls13
+            description:
+              - The minimum TLS version.
+              - If *tls_enabled* is set to `false`, this is ignored.
+              - "Reference: https://developer.hashicorp.com/vault/docs/configuration/listener/tcp#tls_min_version"
+          tls_max_version:
+            type: str
+            required: false
+            default: tls13
+            choices:
+              - tls10
+              - tls11
+              - tls12
+              - tls13
+            description:
+              - The maximum TLS version.
+              - If *tls_enabled* is set to `false`, this is ignored.
+              - "Reference: https://developer.hashicorp.com/vault/docs/configuration/listener/tcp#tls_max_version"
+          tls_cipher_suites:
+            type: str
+            required: false
+            description:
+              - The comma-delimited list of supported cipher suites.
+              - If *tls_enabled* is set to `false`, this is ignored.
+              - "Reference: https://developer.hashicorp.com/vault/docs/configuration/listener/tcp#tls_cipher_suites"
+          tls_client_certificate_mode:
+            type: str
+            required: false
+            default: optional
+            choices:
+              - disabled
+              - optional
+              - required
+            description:
+              - The client certificate mode.
+              - If *tls_enabled* is set to `false`, this is ignored.
+              - If set to `required`, the client must present a certificate.
+              - If set to `optional`, the client may present a certificate.
+              - If set to `disabled`, the client must not present a certificate.
+          tls_client_ca_file:
+            type: path
+            required: false
+            description:
+              - The path to the client CA file.
+              - If *tls_enabled* is set to `false`, this is ignored.
+              - If *tls_client_certificate_mode* is set to `required` or `optional`, this is required.
+              - "Reference: https://developer.hashicorp.com/vault/docs/configuration/listener/tcp#tls_client_ca_file"
+          x_forwarded_for_authorized_addrs:
+            type: list
+            required: false
+            elements: str
+            description:
+              - The list of authorized addresses for the X-Forwarded-For header.
+              - "Reference: https://developer.hashicorp.com/vault/docs/configuration/listener/tcp#x_forwarded_for_authorized_addrs"
+          x_forwarded_for_client_cert_header:
+            type: str
+            required: false
+            description:
+              - The header to use for the client certificate.
+              - If *x_forwarded_for_authorized_addrs* is not provided, this is ignored.
+              - "Reference: https://developer.hashicorp.com/vault/docs/configuration/listener/tcp#x_forwarded_for_client_cert_header"
+          x_forwarded_for_client_cert_header_decoders:
+            type: list
+            required: false
+            elements: str
+            description:
+              - The list of decoders for the client certificate header.
+              - If *x_forwarded_for_authorized_addrs* is not provided, this is ignored.
+              - "Reference: https://developer.hashicorp.com/vault/docs/configuration/listener/tcp#x_forwarded_for_client_cert_header_decoders"
+          x_forwarded_for_hop_skips:
+            type: int
+            required: false
+            default: 0
+            description:
+              - The number of hops to skip in the X-Forwarded-For header.
+              - "Reference: https://developer.hashicorp.com/vault/docs/configuration/listener/tcp#x_forwarded_for_hop_skips"
+          x_forwarded_for_reject_not_authorized:
+            type: bool
+            required: false
+            default: false
+            description:
+              - Whether to reject requests that do not have an authorized address in the X-Forwarded-For header.
+              - "Reference: https://developer.hashicorp.com/vault/docs/configuration/listener/tcp#x_forwarded_for_reject_not_authorized"
+          x_forwarded_for_reject_not_present:
+            type: bool
+            required: false
+            default: false
+            description:
+              - Whether to reject requests that do not have an X-Forwarded-For header.
+              - "Reference: https://developer.hashicorp.com/vault/docs/configuration/listener/tcp#x_forwarded_for_reject_not_present"
+          replication_status_endpoints_enabled:
+            type: bool
+            required: false
+            default: true
+            description:
+              - Whether to enable replication status endpoints.
+              - "Reference: https://developer.hashicorp.com/vault/docs/configuration/listener/tcp#disable_replication_status_endpoints"
+          unauthenticated_metrics_access:
+            type: bool
+            required: false
+            default: false
+            description:
+              - Whether to allow unauthenticated access to metrics.
+              - "Reference: https://developer.hashicorp.com/vault/docs/configuration/listener/tcp#unauthenticated_metrics_access"
+          unauthenticated_pprof_access:
+            type: bool
+            required: false
+            default: false
+            description:
+              - Whether to allow unauthenticated access to pprof.
+              - "Reference: https://developer.hashicorp.com/vault/docs/configuration/listener/tcp#unauthenticated_pprof_access"
+          # unauthenticated_in_flight_requests_access:
+          #   type: bool
+          #   required: false
+          #   default: false
+          #   description:
+          #     - Whether to allow unauthenticated access to in-flight requests.
+          #     - 'Reference: https://developer.hashicorp.com/vault/docs/configuration/listener/tcp#unauthenticated_in_flight_requests_access'
+          vault_backend:
+            type: str
+            required: false
+            default: raft
+            choices:
+              - raft
+            description:
+              - The backend storage type for Vault.
+              - Only `raft` is supported currently.
+      vault_raft_node_id:
+        type: str
+        required: false
+        description:
+          - The node ID for the Vault service.
+          - If *vault_backend* is set to `raft`, this is required.
+          - "Reference: https://developer.hashicorp.com/vault/docs/configuration/storage/raft#node_id"

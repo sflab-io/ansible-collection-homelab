@@ -1,0 +1,119 @@
+---
+# {{ ansible_managed }}
+# Docker Compose configuration for Traefik reverse proxy with HashiCorp Vault PKI ACME integration
+#
+# This configuration deploys Traefik as a reverse proxy that automatically obtains TLS certificates
+# from a HashiCorp Vault PKI intermediate CA via the ACME protocol.
+#
+# Vault PKI Configuration:
+# - ACME directory: {{ docker_vault_acme_endpoint }}
+# - Challenge type: HTTP-01 (requires port 80 accessible)
+# - Root CA: Custom sflab root CA (mounted for trust)
+#
+# Services:
+# - traefik: Reverse proxy with automatic TLS certificate management
+#
+# Routing configured (subdomain):
+# - https://traefik.{{ docker_domain }} -> Traefik dashboard
+
+services:
+  traefik:
+    image: traefik:latest
+    container_name: traefik
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - proxy
+    ports:
+      # HTTP port - Required for ACME HTTP-01 challenge and redirect to HTTPS
+      - "80:80"
+      # HTTPS port - Main entry point for secure traffic
+      - "443:443"
+      # Traefik dashboard API (optional, can be accessed via dashboard.home.sflab.io instead)
+      # - "8080:8080"
+    environment:
+      # Timezone for proper log timestamps
+      - TZ=Europe/Berlin
+    volumes:
+      # Docker socket access for service discovery
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      # ACME certificate storage (persistent across container restarts)
+      - ./letsencrypt:/letsencrypt
+      # add system store to make sflab-root-ca.crt and sflab-intermediate-ca.crt available in docker container
+      - /etc/ssl/certs:/etc/ssl/certs:ro
+    command:
+      # API and Dashboard configuration
+      - "--api.dashboard=true"
+      - "--api.insecure=false"
+
+      # Docker provider configuration
+      - "--providers.docker=true"
+      # Do not expose containers by default - require explicit traefik.enable=true label
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=proxy"
+
+      # Entry points configuration
+      # Web entry point (HTTP) - Used for ACME HTTP-01 challenge and redirect to HTTPS
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+
+      # Websecure entry point (HTTPS) - Main secure entry point
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.websecure.http.tls=true"
+      - "--entrypoints.websecure.http.tls.certresolver=vault"
+
+      # Certificate resolver configuration for HashiCorp Vault PKI ACME
+      # This is the key integration point - using Vault PKI instead of Let's Encrypt
+      - "--certificatesresolvers.vault.acme.email={{ docker_acme_email }}"
+      - "--certificatesresolvers.vault.acme.storage=/letsencrypt/acme.json"
+      # Vault ACME directory endpoint (NOT Let's Encrypt)
+      - "--certificatesresolvers.vault.acme.caserver={{ docker_vault_acme_endpoint }}"
+      # HTTP-01 challenge configuration (Vault PKI supports this method)
+      - "--certificatesresolvers.vault.acme.httpchallenge=true"
+      - "--certificatesresolvers.vault.acme.httpchallenge.entrypoint=web"
+
+      # Logging configuration
+      - "--log.level=INFO"
+      - "--accesslog=true"
+
+      # Metrics (optional)
+      - "--metrics.prometheus=true"
+      - "--metrics.prometheus.entrypoint=websecure"
+    labels:
+      # Enable Traefik for itself (dashboard)
+      - "traefik.enable=true"
+
+      # Dashboard routing configuration (subdomain)
+      # Access via: https://traefik.{{ docker_domain }}
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.{{ docker_domain }}`)"
+      - "traefik.http.routers.dashboard.entrypoints=websecure"
+      - "traefik.http.routers.dashboard.tls=true"
+      - "traefik.http.routers.dashboard.tls.certresolver=vault"
+      - "traefik.http.routers.dashboard.service=api@internal"
+
+      # Dashboard security: Basic authentication middleware
+      # Default credentials: admin/admin (htpasswd format)
+      # Generate new credentials with: htpasswd -nb admin yourpassword
+      - "traefik.http.routers.dashboard.middlewares=dashboard-auth,secure-headers"
+      - "traefik.http.middlewares.dashboard-auth.basicauth.users=admin:$$apr1$$xXiqZV6c$$KBEm7EtQKZ7j1PiW5zeP/."
+
+      # Secure headers middleware (applied to all services)
+      - "traefik.http.middlewares.secure-headers.headers.sslredirect=true"
+      - "traefik.http.middlewares.secure-headers.headers.stsSeconds=31536000"
+      - "traefik.http.middlewares.secure-headers.headers.stsIncludeSubdomains=true"
+      - "traefik.http.middlewares.secure-headers.headers.stsPreload=true"
+      - "traefik.http.middlewares.secure-headers.headers.customFrameOptionsValue=SAMEORIGIN"
+      - "traefik.http.middlewares.secure-headers.headers.contentTypeNosniff=true"
+      - "traefik.http.middlewares.secure-headers.headers.browserXssFilter=true"
+      - "traefik.http.middlewares.secure-headers.headers.referrerPolicy=strict-origin-when-cross-origin"
+      - "traefik.http.middlewares.secure-headers.headers.permissionsPolicy=camera=(), microphone=(), geolocation=()"
+
+# Networks
+networks:
+  # Dedicated proxy network for Traefik and backend services
+  # All services that need to be exposed via Traefik should be on this network
+  proxy:
+    name: proxy
+    driver: bridge

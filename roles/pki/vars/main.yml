@@ -1,0 +1,4 @@
+---
+# Computed Vault URL (follows vault role pattern)
+# Protocol defaults to http but can be changed to https after TLS is enabled
+__pki_vault_url: "{{ pki_vault_api_protocol | default('http') }}://{{ pki_vault_api_host }}:{{ pki_vault_api_port }}"

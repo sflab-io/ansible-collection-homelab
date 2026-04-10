@@ -1,0 +1,59 @@
+---
+#
+# This task file generates the root CA certificate in Vault.
+#
+# Prerequisites:
+# - __pki_vault_init_data fact must be set (loaded via load_vault_init_data.yml)
+# - Root CA PKI secret engine must be enabled
+#
+
+# - name: Debug variables
+#   ansible.builtin.debug:
+#     msg: |
+#       Configuring PKI Root CA with the following settings:
+#         __pki_vault_url: {{ __pki_vault_url }}
+#         pki_root_mount_point: {{ pki_root_mount_point }}
+#         pki_root_common_name: {{ pki_root_common_name }}
+
+- name: Generate Root CA certificate in Vault
+  sflab.homelab.vault_pki_root_ca_certificate:
+    url: "{{ __pki_vault_url }}"
+    auth_method: "token"
+    token: "{{ __pki_vault_init_data.root_token }}"
+    engine_mount_point: "{{ pki_root_mount_point }}"
+    common_name: "{{ pki_root_common_name }}"
+  no_log: true # Token in parameters
+  register: __pki_root_ca_result
+
+# - name: Display PKI root engine configuration status
+#   ansible.builtin.debug:
+#     msg: |
+#       PKI Root Engine Status:
+#         Changed: {{ __pki_root_ca_result.changed }}
+#   when: __pki_root_ca_result is defined
+
+- name: Configure PKI cluster path
+  sflab.homelab.vault_write:
+    url: "{{ __pki_vault_url }}"
+    auth_method: "token"
+    token: "{{ __pki_vault_init_data.root_token }}"
+    path: "{{ pki_root_mount_point }}/config/cluster"
+    data:
+      path: "{{ __pki_vault_url }}/v1/{{ pki_root_mount_point }}"
+      aia_path: "{{ __pki_vault_url }}/v1/{{ pki_root_mount_point }}"
+
+- name: Configure PKI URLs with templating
+  sflab.homelab.vault_write:
+    url: "{{ __pki_vault_url }}"
+    auth_method: "token"
+    token: "{{ __pki_vault_init_data.root_token }}"
+    path: "{{ pki_root_mount_point }}/config/urls"
+    data:
+      # Use templated URLs for issuing certificates, CRL distribution points, and OCSP servers
+      # The {{issuer_id}} and {{cluster_path}} variables will be replaced by Vault at runtime
+      # The expressions surrounding the variables are escaped to prevent Ansible from interpreting them
+      issuing_certificates: "{% raw %}{{cluster_aia_path}}/issuer/{{issuer_id}}/der{% endraw %}"
+      crl_distribution_points: "{% raw %}{{cluster_aia_path}}/issuer/{{issuer_id}}/crl/der{% endraw %}"
+      ocsp_servers: "{% raw %}{{cluster_path}}/ocsp{% endraw %}"
+      enable_templating: true
+  no_log: true # Token in parameters

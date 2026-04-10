@@ -1,0 +1,41 @@
+---
+# defaults file for sflab.homelab.firewall
+firewall_domain: "{{ domain }}"
+firewall_ip: "192.168.1.34"
+
+firewall_acme_account_email: "acme@{{ firewall_domain }}"
+
+firewall_acme_url: "https://vault.{{ firewall_domain }}:8200/v1/pki_intermediate/acme/directory"
+firewall_dns_nsupdate_server: "192.168.1.13"
+firewall_dns_ddns_key_algorithm: "hmac-sha256"
+
+# ---
+# this is just printed as a helper after VLANs are configured to remember user for manual interfaces config
+opnsense_interfaces: []
+
+# this is just printed as a helper after gateways are configured to remember user for manual gateway group config
+opnsense_gateway_groups: []
+
+opnsense_vlans: {}
+
+opnsense_gateways: {}
+
+opnsense_dhcp: {}
+
+opnsense_dhcp_subnets: {}
+
+opnsense_dhcp_reservations: {}
+
+opnsense_aliases: {}
+
+opnsense_nat_outbound: {}
+
+opnsense_shaper_pipes: {}
+
+opnsense_shaper_queues: {}
+
+opnsense_shaper_rules: {}
+
+opnsense_rules: {}
+
+opnsense_tailscale_advertised_routes: {}

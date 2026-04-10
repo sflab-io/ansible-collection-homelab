@@ -1,0 +1,53 @@
+---
+#
+# This task file signs the intermediate CA CSR with the root CA in Vault.
+#
+# Prerequisites:
+# - __pki_vault_init_data fact must be set (loaded via load_vault_init_data.yml)
+# - __pki_intermediate_csr fact must be set (generated via generate_intermediate_ca_certificate.yml)
+# - Root CA PKI secret engine must be enabled
+#
+
+# - name: Debug variables
+#   ansible.builtin.debug:
+#     msg: |
+#       Configuring PKI Intermediate CA with the following parameters:
+#         __pki_vault_url: {{ __pki_vault_url }}
+#         pki_root_mount_point: {{ pki_root_mount_point }}
+#         __pki_intermediate_csr: {{ __pki_intermediate_csr }}
+#         pki_intermediate_common_name: {{ pki_intermediate_common_name }}
+#         pki_intermediate_default_lease_ttl: {{ pki_intermediate_default_lease_ttl }}
+#         pki_intermediate_mount_point: {{ pki_intermediate_mount_point }}
+
+- name: Sign intermediate CSR with root CA
+  sflab.homelab.vault_pki_sign_intermediate:
+    url: "{{ __pki_vault_url }}"
+    auth_method: "token"
+    token: "{{ __pki_vault_init_data.root_token }}"
+    engine_mount_point: "{{ pki_root_mount_point }}" # Mount-Punkt der ROOT CA
+    csr: "{{ __pki_intermediate_csr.csr }}"
+    common_name: "{{ pki_intermediate_common_name }}"
+    ttl: "{{ pki_intermediate_default_lease_ttl }}" # 5 Jahre
+  register: signed_cert
+
+# - name: Display PKI intermediate signing status
+#   ansible.builtin.debug:
+#     msg: |
+#       PKI Intermediate Signing Status:
+#         Changed: {{ signed_cert.changed }}
+#   when: signed_cert is defined
+
+- name: Set signed certificate back to intermediate CA
+  sflab.homelab.vault_pki_set_signed_intermediate:
+    url: "{{ __pki_vault_url }}"
+    auth_method: "token"
+    token: "{{ __pki_vault_init_data.root_token }}"
+    engine_mount_point: "{{ pki_intermediate_mount_point }}"
+    certificate: "{{ signed_cert.certificate }}"
+  register: set_signed_cert
+# - name: Display PKI intermediate signing status
+#   ansible.builtin.debug:
+#     msg: |
+#       PKI Intermediate Set Signed Certificate Status:
+#         Changed: {{ set_signed_cert.changed }}
+#   when: set_signed_cert is defined

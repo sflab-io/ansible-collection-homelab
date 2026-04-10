@@ -1,0 +1,25 @@
+---
+- name: Validate
+  ansible.builtin.import_tasks: validate/main.yml
+
+- name: Add repository
+  ansible.builtin.import_tasks: repository.yml
+
+- name: Create user
+  ansible.builtin.import_tasks: user.yml
+
+- name: Create directories
+  ansible.builtin.import_tasks: directories.yml
+
+- name: Install HashiCorp Vault
+  ansible.builtin.import_tasks: install.yml
+
+- name: Configure service
+  ansible.builtin.import_tasks: service.yml
+
+# # For testing purposes omly, we uninitialize and reinitialize vault
+# - name: Uninitialize vault
+#   ansible.builtin.import_tasks: uninit.yml
+
+- name: Init vault
+  ansible.builtin.import_tasks: init.yml

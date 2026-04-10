@@ -1,0 +1,100 @@
+---
+- name: Install os-acme-client package
+  oxlorg.opnsense.package:
+    name: os-acme-client
+    action: install
+
+# 1. Import Vault TLS CA into OPNsense trust store
+#     acme.sh needs to verify vault's TLS certificate when registering the ACME account
+- name: Fetch Vault TLS certificate chain
+  community.crypto.get_certificate:
+    host: "vault.{{ firewall_domain }}"
+    port: 8200
+    get_certificate_chain: true
+  register: __vault_tls_chain
+  delegate_to: localhost
+
+- name: Check if Vault TLS CA is already in OPNsense trust store
+  oxlorg.opnsense.raw:
+    module: trust
+    controller: ca
+    command: search
+    action: get
+  register: __opnsense_ca_list
+
+- name: Import Vault TLS CA into OPNsense trust store
+  oxlorg.opnsense.raw:
+    module: trust
+    controller: ca
+    command: add
+    action: post
+    data:
+      ca:
+        descr: "Vault TLS CA"
+        crt_payload: "{{ __vault_tls_chain.unverified_chain | last }}"
+        action: "existing"
+  when: >
+    __opnsense_ca_list.response.rows |
+    selectattr('descr', 'equalto', 'Vault TLS CA') |
+    list | length == 0
+
+# 2. ACME General Settings
+- name: Configure ACME general settings
+  oxlorg.opnsense.acme_general:
+    auto_renewal: true
+    log_level: debug # normal
+    enabled: true
+
+# 3. ACME Account
+- name: Create Vault PKI ACME account
+  oxlorg.opnsense.acme_account:
+    name: vault_pki
+    description: Internal Vault PKI ACME Account
+    email: "acme@{{ firewall_domain }}"
+    ca: custom
+    custom_ca: "{{ firewall_acme_url }}"
+    register: false
+    state: present
+
+# 4. DNS Validation
+- name: Configure DNS-01 validation via nsupdate
+  oxlorg.opnsense.acme_validation:
+    name: dns_nsupdate_validation
+    description: DNS-01 validation via Bind nsupdate
+    method: dns01
+    dns_service: dns_nsupdate
+    dns_nsupdate_server: "{{ firewall_dns_nsupdate_server}}"
+    dns_nsupdate_zone: "{{ firewall_domain }}"
+    dns_nsupdate_key: |
+      key "ddnskey" {
+        algorithm {{ firewall_dns_ddns_key_algorithm }};
+        secret "{{ lookup('env', 'DNS_KEY_SECRET') }}";
+      };
+    dns_sleep: 60
+    state: "present"
+
+# 5. DNS Override for Vault (so OPNsense can resolve vault.home.sflab.io)
+- name: Add DNS override for Vault server
+  oxlorg.opnsense.unbound_host:
+    hostname: vault
+    domain: "{{ firewall_domain }}"
+    value: "{{ firewall_ip}}"
+    state: present
+
+# 6. Apply DNS changes
+- name: Apply Unbound configuration
+  oxlorg.opnsense.reload:
+    target: unbound
+
+# 7. Certificate
+- name: Create OPNsense certificate
+  oxlorg.opnsense.acme_certificate:
+    name: "opnsense.{{ firewall_domain }}"
+    description: OPNsense Web UI Certificate
+    account: vault_pki
+    validation: dns_nsupdate_validation
+    auto_renewal: true
+    renew_interval: 60
+    key_length: key_4096
+    ocsp: false
+    state: present

@@ -1,0 +1,63 @@
+---
+- name: Stop Vault service
+  become: true
+  ansible.builtin.systemd_service:
+    name: vault.service
+    state: stopped
+
+- name: Check if Raft data directory exists
+  become: true
+  ansible.builtin.stat:
+    path: "{{ vault_raft_data_directory }}"
+  register: _vault_raft_dir
+
+- name: Remove Raft data directory contents
+  when: _vault_raft_dir.stat.exists
+  become: true
+  ansible.builtin.file:
+    path: "{{ vault_raft_data_directory }}"
+    state: absent
+
+- name: Recreate Raft data directory
+  when: _vault_raft_dir.stat.exists
+  become: true
+  ansible.builtin.file:
+    path: "{{ vault_raft_data_directory }}"
+    owner: "{{ vault_user }}"
+    group: "{{ vault_group }}"
+    mode: "0750"
+    state: directory
+
+- name: Remove vault log file
+  become: true
+  ansible.builtin.file:
+    path: "{{ vault_log_file }}"
+    state: absent
+
+- name: Start Vault service
+  become: true
+  ansible.builtin.systemd_service:
+    name: vault.service
+    state: started
+
+- name: Wait for Vault API to be available
+  ansible.builtin.uri:
+    url: "http://{{ ansible_facts['default_ipv4']['address'] }}:{{ vault_api_port }}/v1/sys/health"
+    method: GET
+    status_code: [200, 429, 472, 473, 501, 503]
+  register: _vault_health
+  until: _vault_health.status is defined
+  retries: 10
+  delay: 3
+
+- name: Verify Vault is uninitialized
+  ansible.builtin.uri:
+    url: "http://{{ ansible_facts['default_ipv4']['address'] }}:{{ vault_api_port }}/v1/sys/init"
+    method: GET
+    return_content: true
+  register: _vault_init_status
+  failed_when: _vault_init_status.json.initialized
+
+- name: Display uninit status
+  ansible.builtin.debug:
+    msg: "Vault has been successfully reset to uninitialized state (initialized={{ _vault_init_status.json.initialized }})"

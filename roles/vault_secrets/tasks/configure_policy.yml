@@ -1,0 +1,43 @@
+---
+#
+# This task file creates a Vault ACL policy for the secrets engine.
+#
+# The policy grants full CRUD + list capabilities on the secrets engine paths.
+# Idempotency: checks via GET before writing.
+#
+# Prerequisites:
+# - __vault_secrets_init_data fact must be set (loaded via load_vault_init_data.yml)
+# - __vault_secrets_url fact must be set (loaded via load_vault_init_data.yml)
+#
+
+- name: Check if Vault policy exists
+  ansible.builtin.uri:
+    url: "{{ __vault_secrets_url }}/v1/sys/policies/acl/{{ vault_secrets_policy_name }}"
+    method: GET
+    headers:
+      X-Vault-Token: "{{ __vault_secrets_init_data.root_token }}"
+    validate_certs: "{{ vault_secrets_validate_certs }}"
+    status_code:
+      - 200
+      - 403
+      - 404
+  register: __vault_secrets_policy_check
+  no_log: true
+
+- name: Create Vault policy
+  sflab.homelab.vault_write:
+    url: "{{ __vault_secrets_url }}"
+    auth_method: "token"
+    token: "{{ __vault_secrets_init_data.root_token }}"
+    path: "sys/policies/acl/{{ vault_secrets_policy_name }}"
+    validate_certs: "{{ vault_secrets_validate_certs }}"
+    data:
+      policy: |
+        path "{{ vault_secrets_engine_name }}/*" {
+          capabilities = ["create", "read", "update", "delete", "list"]
+        }
+        path "{{ vault_secrets_engine_name }}/metadata/*" {
+          capabilities = ["create", "read", "update", "delete", "list"]
+        }
+  when: __vault_secrets_policy_check.status == 404
+  no_log: true

@@ -1,0 +1,68 @@
+---
+# argument spec file for sflab.homelab.vault_secrets
+
+argument_specs:
+  main:
+    short_description: Configure a KV-v2 secrets engine and AppRole in HashiCorp Vault.
+    description:
+      - Creates a KV-v2 secrets engine in Vault.
+      - Creates a Vault policy granting full access to the secrets engine.
+      - Enables the AppRole auth method and creates an AppRole bound to the policy.
+      - Outputs the Role ID and Secret ID to a JSON file for later use.
+    options:
+      vault_secrets_engine_name:
+        type: str
+        required: false
+        default: "secrets_homelab"
+        description:
+          - The mount point name for the KV-v2 secrets engine.
+      vault_secrets_approle_name:
+        type: str
+        required: false
+        default: "approle_secrets_homelab"
+        description:
+          - The name of the AppRole to create in Vault.
+      vault_secrets_policy_name:
+        type: str
+        required: false
+        default: "policy_secrets_homelab"
+        description:
+          - The name of the Vault ACL policy to create.
+      vault_secrets_output_file:
+        type: path
+        required: false
+        default: "/etc/vault.d/vault-secrets-approle.json"
+        description:
+          - The path to the file where the AppRole credentials (Role ID and Secret ID) will be written.
+          - The file is created with mode 0600 and only generated once (if the file does not exist).
+      vault_secrets_init_data_file:
+        type: path
+        required: false
+        default: "/etc/vault.d/vault-init-data.json"
+        description:
+          - The path to the Vault initialization data file containing the root token.
+          - This file is created by the vault role during initialization.
+      vault_secrets_api_protocol:
+        type: str
+        required: false
+        default: "https"
+        description:
+          - The protocol to use when connecting to the Vault API (http or https).
+      vault_secrets_api_host:
+        type: str
+        required: false
+        default: "{{ ansible_facts['default_ipv4']['address'] }}"
+        description:
+          - The IP address or FQDN of the Vault API endpoint.
+      vault_secrets_api_port:
+        type: int
+        required: false
+        default: 8200
+        description:
+          - The port on which the Vault API is listening.
+      vault_secrets_validate_certs:
+        type: bool
+        required: false
+        default: false
+        description:
+          - Whether to validate TLS certificates when connecting to the Vault API.

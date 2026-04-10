@@ -1,0 +1,58 @@
+---
+pki_vault_domain: "{{ domain }}"
+
+# Vault connection settings
+pki_vault_api_protocol: "https" # Change to "https" after TLS is enabled
+pki_vault_api_host: "{{ ansible_facts['fqdn'] }}"
+pki_vault_api_port: 8200
+
+# Path to vault init data file (created by vault role)
+pki_vault_init_data_file: "/etc/vault.d/vault-init-data.json"
+
+# PKI root CA secret engine configuration
+pki_root_mount_point: "pki_root"
+pki_root_description: "Root CA PKI secret engine"
+pki_root_common_name: "Root CA"
+pki_root_default_lease_ttl: "43800h" # 5 years
+pki_root_max_lease_ttl: "87600h" # 10 years
+# Whether to replace a non-PKI secret engine at the mount point
+pki_root_replace_different_backend: true
+
+# PKI intermediate CA secret engine configuration
+pki_intermediate_mount_point: "pki_intermediate"
+pki_intermediate_description: "Intermediate CA PKI secret engine"
+pki_intermediate_common_name: "Intermediate CA"
+pki_intermediate_default_lease_ttl: "43800h" # 5 years
+pki_intermediate_max_lease_ttl: "87600h" # 10 years
+# Whether to replace a non-PKI secret engine at the mount point
+pki_intermediate_replace_different_backend: true
+
+# PKI role for issuing Vault TLS certificates
+pki_vault_certificate_role_30: "sflab-local-30"
+pki_vault_certificate_ttl_30: "720h" # 30 days (matches sflab-local-30 role max TTL)
+pki_vault_certificate_role_90: "sflab-local-90"
+pki_vault_certificate_ttl_90: "2160h" # 90 days (matches sflab-local-90 role max TTL)
+pki_vault_certificate_role_365: "sflab-local-365"
+pki_vault_certificate_ttl_365: "8760h" # 365 days (matches sflab-local-365 role max TTL)
+pki_vault_certificate_role_3650: "sflab-local-3650"
+pki_vault_certificate_ttl_3650: "87600h" # 10 years (matches sflab-local-3650 role max TTL)
+
+# Vault TLS certificate configuration
+# Feature flag - must be explicitly enabled to issue certificate
+pki_vault_certificate_enabled: false
+
+# Certificate renewal settings
+pki_vault_certificate_renewal_days: 7 # Renew 7 days before expiry
+
+# File paths for certificate and key
+pki_vault_tls_directory: /etc/vault.d/tls
+pki_vault_certificate_path: "{{ pki_vault_tls_directory }}/vault.crt"
+pki_vault_certificate_key_path: "{{ pki_vault_tls_directory }}/vault.key"
+pki_vault_certificate_fullchain_path: "{{ pki_vault_tls_directory }}/vault-fullchain.crt"
+
+# Certificate specification
+pki_vault_certificate_common_name: "vault.{{ pki_vault_domain }}"
+pki_vault_certificate_alt_names:
+  - "vault.{{ pki_vault_domain }}"
+pki_vault_certificate_ip_sans:
+  - "{{ ansible_facts['default_ipv4']['address'] }}"

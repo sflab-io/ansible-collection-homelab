@@ -1,0 +1,26 @@
+---
+# defaults file for sflab.homelab.docker
+
+# Reverse proxy type to deploy
+# Options: "traefik" or "caddy"
+# - traefik: Uses Traefik reverse proxy (requires HTTPS for Vault ACME)
+# - caddy: Uses Caddy reverse proxy (supports HTTP Vault ACME)
+# docker_reverse_proxy_type: "caddy"
+
+# Base domain for the reverse proxy
+# Services will be accessed via subdomains: service.docker_domain
+# Example: portainer.docker.{{ domain }}, whoami.docker.{{ domain }}
+docker_domain: "docker.{{ domain }}"
+
+# Vault PKI ACME directory endpoint URL
+docker_vault_acme_endpoint: "https://vault.{{ domain }}:8200/v1/pki_intermediate/acme/directory"
+
+# ACME email address
+docker_acme_email: "acme@{{ domain }}"
+
+# Deploy Traefik reverse proxy
+docker_deploy_traefik: true
+
+# Deploy Portainer container management UI
+# Accessible via: https://portainer.{docker_domain}
+docker_deploy_portainer: true

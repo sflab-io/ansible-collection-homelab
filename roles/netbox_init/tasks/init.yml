@@ -1,0 +1,200 @@
+---
+- name: "Install python pip on ubuntu"
+  ansible.builtin.apt:
+    name: python3-pip
+    state: present
+
+- name: "Install pynetbox python library"
+  ansible.builtin.pip:
+    name: pynetbox
+    state: present
+    break_system_packages: true
+
+# --- Initialize NetBox sites, regions and tenant informations ---
+
+- name: "Create NetBox regions"
+  netbox.netbox.netbox_region:
+    data:
+      name: "{{ item.name }}"
+      description: "{{ item.description | default(omit) }}"
+    state: present
+  loop: "{{ netbox_init_regions }}"
+
+- name: "Create NetBox sites"
+  netbox.netbox.netbox_site:
+    data:
+      name: "{{ item.name }}"
+      facility: "{{ item.facility | default(omit) }}"
+      latitude: "{{ item.latitude | default(omit) }}"
+      longitude: "{{ item.longitude | default(omit) }}"
+      time_zone: "{{ item.time_zone | default(omit) }}"
+      region: "{{ item.region | default(omit) }}"
+    state: present
+  loop: "{{ netbox_init_sites }}"
+
+- name: "Create NetBox tenant groups"
+  netbox.netbox.netbox_tenant_group:
+    data:
+      name: "{{ item.name }}"
+    state: present
+  loop: "{{ netbox_init_tenant_groups }}"
+
+- name: "Create NetBox tenants"
+  netbox.netbox.netbox_tenant:
+    data:
+      name: "{{ item.name }}"
+      tenant_group: "{{ item.tenant_group | default(omit) }}"
+    state: present
+  loop: "{{ netbox_init_tenants }}"
+
+- name: "Create NetBox contact groups"
+  netbox.netbox.netbox_contact_group:
+    data:
+      name: "{{ item.name }}"
+    state: present
+  loop: "{{ netbox_init_contact_groups }}"
+
+- name: "Create NetBox contact roles"
+  netbox.netbox.netbox_contact_role:
+    data:
+      name: "{{ item.name }}"
+    state: present
+  loop: "{{ netbox_init_contact_roles }}"
+
+- name: "Create NetBox contacts"
+  netbox.netbox.netbox_contact:
+    data:
+      name: "{{ item.name }}"
+      email: "{{ item.email | default(omit) }}"
+      phone: "{{ item.phone | default(omit) }}"
+      contact_groups: "{{ item.contact_groups | default(omit) }}"
+    state: present
+  loop: "{{ netbox_init_contacts }}"
+
+# --- Initial rack specific data ---
+# Note: netbox.netbox 3.22.0 has no rack_type object; type/width/u_height go directly on the rack
+
+- name: "Create NetBox racks"
+  netbox.netbox.netbox_rack:
+    data:
+      name: "{{ item.name }}"
+      site: "{{ item.site }}"
+      status: "{{ item.status | default(omit) }}"
+      type: "{{ item.type | default(omit) }}"
+      width: "{{ item.width | default(omit) }}"
+      u_height: "{{ item.u_height | default(omit) }}"
+    state: present
+  loop: "{{ netbox_init_racks | default([]) }}"
+
+- name: Create device role within NetBox with only required information
+  netbox.netbox.netbox_device_role:
+    data:
+      name: "{{ item.name }}"
+      color: "{{ item.color }}"
+    state: present
+  loop: "{{ netbox_init_device_roles | default([]) }}"
+
+- name: Create manufacturer within NetBox with only required information
+  netbox.netbox.netbox_manufacturer:
+    data:
+      name: "{{ item.name }}"
+    state: present
+  loop: "{{ netbox_init_manufacturers | default([]) }}"
+
+- name: Create device type within NetBox with only required information
+  netbox.netbox.netbox_device_type:
+    data:
+      model: "{{ item.model }}"
+      manufacturer: "{{ item.manufacturer }}"
+      u_height: "{{ item.u_height }}"
+    state: present
+  loop: "{{ netbox_init_device_types | default([]) }}"
+
+# --- Initialize devices, interfaces, and IP addresses ---
+
+- name: "Create NetBox devices"
+  netbox.netbox.netbox_device:
+    data:
+      name: "{{ item.name }}"
+      device_type: "{{ item.device_type }}"
+      device_role: "{{ item.role_name }}"
+      site: "{{ item.site_name }}"
+      tenant: "{{ item.tenant_name | default(omit) }}"
+      rack: "{{ item.rack_name | default(omit) }}"
+    state: present
+  loop: "{{ netbox_init_devices | default([]) }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: "Create NetBox device interfaces"
+  netbox.netbox.netbox_device_interface:
+    data:
+      name: "{{ item.1.name }}"
+      type: "{{ item.1.type }}"
+      device: "{{ item.0.name }}"
+    state: present
+  loop: "{{ netbox_init_devices | subelements('interfaces', skip_missing=True) | default([]) }}"
+  loop_control:
+    label: "{{ item.0.name }}/{{ item.1.name }}"
+
+- name: "Create NetBox device IP addresses"
+  ansible.builtin.include_tasks: init_device_ip_addresses.yml
+  loop: "{{ netbox_init_devices | subelements('interfaces', skip_missing=True) | default([]) }}"
+  loop_control:
+    loop_var: __netbox_device_interface_pair
+    label: "{{ __netbox_device_interface_pair.0.name }}/{{ __netbox_device_interface_pair.1.name }}"
+
+# --- Initialize IPAM (VLANs and prefixes) ---
+
+- name: "Create NetBox VLANs"
+  netbox.netbox.netbox_vlan:
+    data:
+      name: "{{ item.name }}"
+      vid: "{{ item.vid }}"
+      description: "{{ item.description | default(omit) }}"
+    state: present
+  loop: "{{ netbox_init_vlans | default([]) }}"
+
+- name: "Create NetBox prefixes"
+  netbox.netbox.netbox_prefix:
+    data:
+      prefix: "{{ item.prefix }}"
+      status: "{{ item.status | default(omit) }}"
+      description: "{{ item.description | default(omit) }}"
+      vlan: "{{ {'vid': item.vlan_id} | default(omit) }}"
+    state: present
+  loop: "{{ netbox_init_prefixes | default([]) }}"
+
+# --- Initialize virtualization (cluster types and clusters) ---
+
+- name: "Create NetBox cluster types"
+  netbox.netbox.netbox_cluster_type:
+    data:
+      name: "{{ item.name }}"
+    state: present
+  loop: "{{ netbox_init_cluster_types | default([]) }}"
+
+- name: "Create NetBox clusters"
+  netbox.netbox.netbox_cluster:
+    data:
+      name: "{{ item.name }}"
+      cluster_type: "{{ item.cluster_type_name }}"
+      scope_type: "{{ item.scope_type | default(omit) }}"
+      scope: "{{ item.scope_name | default(omit) }}"
+      tenant: "{{ item.tenant_name | default(omit) }}"
+    state: present
+  loop: "{{ netbox_init_clusters | default([]) }}"
+
+# --- Initialize wireless LANs ---
+
+- name: "Create NetBox wireless LANs"
+  netbox.netbox.netbox_wireless_lan:
+    data:
+      ssid: "{{ item.ssid }}"
+      description: "{{ item.description | default(omit) }}"
+      status: "{{ item.status | default(omit) }}"
+      auth_type: "{{ item.auth_type | default(omit) }}"
+      auth_cipher: "{{ item.auth_cipher | default(omit) }}"
+      vlan: "{{ {'name': item.vlan_name} if item.vlan_name is defined else omit }}"
+    state: present
+  loop: "{{ netbox_init_wireless_lans | default([]) }}"

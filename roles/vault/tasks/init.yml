@@ -1,0 +1,102 @@
+---
+#
+# This task file initializes and unseals a Vault instance by interacting with its API.
+#
+# Vault init data is persisted to /etc/vault.d/vault-init-data.json on the server
+# so that the root token and unseal keys can be reused on subsequent playbook runs.
+#
+- name: Set vault init data file path
+  ansible.builtin.set_fact:
+    __vault_init_data_file: "/etc/vault.d/vault-init-data.json"
+
+- name: Check if Vault is already initialized
+  ansible.builtin.uri:
+    url: "{{ vault_api_protocol }}://{{ ansible_facts['default_ipv4']['address'] }}:{{ vault_api_port }}/v1/sys/init"
+    method: GET
+    return_content: true
+    status_code: 200
+    validate_certs: "{{ vault_api_validate_certs }}"
+  register: __vault_init_status
+  changed_when: false
+
+- name: Check if vault init data file exists
+  ansible.builtin.stat:
+    path: "{{ __vault_init_data_file }}"
+  register: __vault_init_data_file_stat
+
+- name: Load vault init data from file if it exists
+  ansible.builtin.slurp:
+    src: "{{ __vault_init_data_file }}"
+  register: __vault_init_data_content
+  when: __vault_init_data_file_stat.stat.exists
+
+- name: Parse vault init data from file
+  ansible.builtin.set_fact:
+    vault_init_result: "{{ __vault_init_data_content.content | b64decode | from_json }}"
+  when: __vault_init_data_file_stat.stat.exists
+
+- name: Fail if Vault is initialized but init data file is missing
+  ansible.builtin.fail:
+    msg: |
+      Vault is already initialized, but the init data file is missing at {{ __vault_init_data_file }}.
+      This file contains the root token and unseal keys required for Vault operations.
+      Please restore the file from a backup or manually provide the root token.
+  when:
+    - __vault_init_status.json.initialized
+    - not __vault_init_data_file_stat.stat.exists
+
+- name: Initialize Vault
+  sflab.homelab.vault_init:
+    url: "{{ vault_api_protocol }}://{{ ansible_facts['default_ipv4']['address'] }}:{{ vault_api_port }}"
+    secret_shares: 5
+    secret_threshold: 3
+  register: vault_init_result
+  when: not __vault_init_status.json.initialized
+
+- name: Save vault init data to file
+  ansible.builtin.copy:
+    content: "{{ vault_init_result | to_nice_json }}"
+    dest: "{{ __vault_init_data_file }}"
+    owner: "{{ vault_group }}"
+    group: "{{ vault_user }}"
+    mode: "0600"
+  when:
+    - not __vault_init_status.json.initialized
+    - vault_init_result is defined
+    - vault_init_result.root_token is defined
+
+# Unseal vault if it is sealed and we have the unseal keys available
+
+- name: Check Vault seal status
+  ansible.builtin.uri:
+    url: "{{ vault_api_protocol }}://{{ ansible_facts['default_ipv4']['address'] }}:{{ vault_api_port }}/v1/sys/seal-status"
+    method: GET
+    validate_certs: "{{ vault_api_validate_certs }}"
+    return_content: true
+  register: vault_seal_status
+  changed_when: false
+
+- name: Unseal Vault
+  sflab.homelab.vault_unseal:
+    url: "{{ vault_api_protocol }}://{{ ansible_facts['default_ipv4']['address'] }}:{{ vault_api_port }}"
+    unseal_keys: "{{ vault_init_result.keys_base64[:3] }}"
+  when:
+    - vault_seal_status.json.sealed
+    - vault_init_result is defined
+    - vault_init_result.keys_base64 is defined
+
+- name: Verify Vault is unsealed
+  ansible.builtin.uri:
+    url: "{{ vault_api_protocol }}://{{ ansible_facts['default_ipv4']['address'] }}:{{ vault_api_port }}/v1/sys/seal-status"
+    method: GET
+    validate_certs: "{{ vault_api_validate_certs }}"
+    return_content: true
+  register: vault_final_status
+  changed_when: false
+  failed_when: vault_final_status.json.sealed
+
+- name: Debug final Vault status
+  ansible.builtin.debug:
+    msg: |
+      Vault sealed: {{ vault_final_status.json.sealed }}
+      Vault initialized: {{ vault_final_status.json.initialized }}

@@ -1,0 +1,10 @@
+---
+common_hostname: "{{ ansible_host }}"
+common_domain: "home.sflab.io"
+
+common_add_vault_certificates_to_trust_store: true
+common_vault_pki_url: "https://vault.{{ common_domain }}:8200"
+common_vault_pki_mount: "pki_root"
+common_vault_pki_intermediate_mount: "pki_intermediate"
+common_root_ca_cert_name: "sflab-root-ca"
+common_intermediate_ca_cert_name: "sflab-intermediate-ca"

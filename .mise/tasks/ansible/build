@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+#MISE description="Build the Ansible collection"
+
+set -euo pipefail
+
+# Read metadata from galaxy.yml
+VERSION=$(grep "^version:" "${MISE_CONFIG_ROOT}/galaxy.yml" | awk '{print $2}')
+NAMESPACE=$(grep "^namespace:" "${MISE_CONFIG_ROOT}/galaxy.yml" | awk '{print $2}' | tr -d '"')
+NAME=$(grep "^name:" "${MISE_CONFIG_ROOT}/galaxy.yml" | awk '{print $2}' | tr -d '"')
+TAG="v${VERSION}"
+
+echo "Building collection ${NAMESPACE}.${NAME} ${TAG}..."
+
+# Create a clean temp copy without local artifacts (e.g. .venv)
+TMPDIR=$(mktemp -d)
+trap 'rm -rf "${TMPDIR}"' EXIT
+rsync -a \
+    --exclude='.venv' \
+    --exclude='venv' \
+    --exclude='dist' \
+    --exclude='.git' \
+    --exclude='__pycache__' \
+    --exclude='*.tar.gz' \
+    "${MISE_CONFIG_ROOT}/" "${TMPDIR}/"
+
+# Step 1: Build the collection archive and export it
+dagger \
+    -m github.com/stuttgart-things/dagger/ansible@v0.84.0 \
+    call build \
+    --src "${TMPDIR}" \
+    export --path "${MISE_CONFIG_ROOT}/dist"

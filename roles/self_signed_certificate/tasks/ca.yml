@@ -1,0 +1,51 @@
+---
+- name: Check if CA certificate and key already exist
+  ansible.builtin.stat:
+    path: "{{ item }}"
+  loop:
+    - "{{ vault_tls_directory }}/ca.key"
+    - "{{ vault_tls_directory }}/ca.crt"
+  register: __ca_files
+
+# Generate Certificate Authority (CA) self-signed certificate
+- name: Generate Certificate Authority (CA) self-signed certificate
+  when: (__ca_files.results | selectattr('stat.exists', 'equalto', false) | list | length) > 0
+  block:
+    - name: Generate Root CA private key
+      community.crypto.openssl_privatekey:
+        path: "{{ vault_tls_directory }}/ca.key"
+        owner: "{{ cert_vault_user }}"
+        group: "{{ cert_vault_group }}"
+
+    - name: Generate Root CA CSR
+      community.crypto.openssl_csr:
+        path: "{{ vault_tls_directory }}/ca.csr"
+        privatekey_path: "{{ vault_tls_directory }}/ca.key"
+        common_name: "{{ cert_common_name }}"
+        organization_name: "{{ cert_organization_name }}"
+        basic_constraints:
+          - CA:TRUE
+        basic_constraints_critical: yes
+        key_usage:
+          - keyCertSign
+          - digitalSignature
+          - cRLSign
+        key_usage_critical: yes
+        owner: "{{ cert_vault_user }}"
+        group: "{{ cert_vault_group }}"
+
+    - name: Generate Root CA certificate
+      community.crypto.x509_certificate:
+        path: "{{ vault_tls_directory }}/ca.crt"
+        privatekey_path: "{{ vault_tls_directory }}/ca.key"
+        csr_path: "{{ vault_tls_directory }}/ca.csr"
+        provider: selfsigned
+        owner: "{{ cert_vault_user }}"
+        group: "{{ cert_vault_group }}"
+
+    - name: Clean up intermediate files
+      file:
+        path: "{{ item }}"
+        state: absent
+      with_items:
+        - "{{ vault_tls_directory }}/ca.csr"

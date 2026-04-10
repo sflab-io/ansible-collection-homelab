@@ -1,0 +1,12 @@
+---
+# argument spec file for sflab.homelab.technitium
+
+argument_specs:
+  main:
+    short_description: "Argument specifications for sflab.homelab.common role"
+    # options:
+    #   common_hostname:
+    #     type: str
+    #     description: "Hostname to set on the target machine"
+    #     required: false
+    #     default: "{{ ansible_host }}"

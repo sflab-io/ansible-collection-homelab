@@ -1,0 +1,64 @@
+---
+#
+# This task file enables the AppRole auth method and creates the AppRole.
+#
+# Idempotency:
+# - AppRole auth method: checked via GET /v1/sys/auth before enabling
+# - AppRole role: checked via GET /v1/auth/approle/role/{name} before creating
+#
+# Prerequisites:
+# - __vault_secrets_init_data fact must be set (loaded via load_vault_init_data.yml)
+# - __vault_secrets_url fact must be set (loaded via load_vault_init_data.yml)
+# - vault_secrets_policy_name must be defined (created via configure_policy.yml)
+#
+
+- name: Check if AppRole auth method is enabled
+  ansible.builtin.uri:
+    url: "{{ __vault_secrets_url }}/v1/sys/auth"
+    method: GET
+    headers:
+      X-Vault-Token: "{{ __vault_secrets_init_data.root_token }}"
+    validate_certs: "{{ vault_secrets_validate_certs }}"
+    status_code:
+      - 200
+  register: __vault_secrets_auth_methods
+  no_log: true
+
+- name: Enable AppRole auth method
+  sflab.homelab.vault_write:
+    url: "{{ __vault_secrets_url }}"
+    auth_method: "token"
+    token: "{{ __vault_secrets_init_data.root_token }}"
+    path: "sys/auth/approle"
+    validate_certs: "{{ vault_secrets_validate_certs }}"
+    data:
+      type: "approle"
+  when: "'approle/' not in __vault_secrets_auth_methods.json.data"
+  no_log: true
+
+- name: Check if AppRole role exists
+  ansible.builtin.uri:
+    url: "{{ __vault_secrets_url }}/v1/auth/approle/role/{{ vault_secrets_approle_name }}"
+    method: GET
+    headers:
+      X-Vault-Token: "{{ __vault_secrets_init_data.root_token }}"
+    validate_certs: "{{ vault_secrets_validate_certs }}"
+    status_code:
+      - 200
+      - 404
+  register: __vault_secrets_approle_check
+  no_log: true
+
+- name: Create AppRole role
+  sflab.homelab.vault_write:
+    url: "{{ __vault_secrets_url }}"
+    auth_method: "token"
+    token: "{{ __vault_secrets_init_data.root_token }}"
+    path: "auth/approle/role/{{ vault_secrets_approle_name }}"
+    validate_certs: "{{ vault_secrets_validate_certs }}"
+    data:
+      token_policies:
+        - "{{ vault_secrets_policy_name }}"
+      token_type: "service"
+  when: __vault_secrets_approle_check.status == 404
+  no_log: true

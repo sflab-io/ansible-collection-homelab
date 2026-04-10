@@ -1,0 +1,24 @@
+---
+- name: Update repositories cache and install "curl" package
+  ansible.builtin.apt:
+    name: curl
+    update_cache: yes
+
+- name: Download Technitium DNS install script
+  ansible.builtin.get_url:
+    url: https://download.technitium.com/dns/install.sh
+    dest: /tmp/technitium-install.sh
+    mode: "0755"
+  register: technitium_script
+
+- name: Execute Technitium DNS install script
+  ansible.builtin.command:
+    cmd: /tmp/technitium-install.sh
+  become: true
+  when: technitium_script is changed
+  changed_when: true
+
+- name: Remove install script
+  ansible.builtin.file:
+    path: /tmp/technitium-install.sh
+    state: absent

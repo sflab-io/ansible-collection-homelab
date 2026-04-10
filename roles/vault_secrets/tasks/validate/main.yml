@@ -1,0 +1,24 @@
+---
+- name: Validate vault_secrets_engine_name is defined
+  ansible.builtin.assert:
+    that:
+      - vault_secrets_engine_name is defined
+      - vault_secrets_engine_name | length > 0
+    fail_msg: "vault_secrets_engine_name must be defined and non-empty."
+    success_msg: "vault_secrets_engine_name is defined."
+
+- name: Validate vault_secrets_approle_name is defined
+  ansible.builtin.assert:
+    that:
+      - vault_secrets_approle_name is defined
+      - vault_secrets_approle_name | length > 0
+    fail_msg: "vault_secrets_approle_name must be defined and non-empty."
+    success_msg: "vault_secrets_approle_name is defined."
+
+- name: Validate vault_secrets_policy_name is defined
+  ansible.builtin.assert:
+    that:
+      - vault_secrets_policy_name is defined
+      - vault_secrets_policy_name | length > 0
+    fail_msg: "vault_secrets_policy_name must be defined and non-empty."
+    success_msg: "vault_secrets_policy_name is defined."

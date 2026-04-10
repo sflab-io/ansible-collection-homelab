@@ -1,0 +1,25 @@
+---
+- name: "Create IP addresses on {{ __netbox_device_interface_pair.0.name }}/{{ __netbox_device_interface_pair.1.name }}"
+  netbox.netbox.netbox_ip_address:
+    data:
+      address: "{{ item.address }}"
+      dns_name: "{{ item.dns_name | default(omit) }}"
+      description: "{{ item.description | default(omit) }}"
+      status: "{{ item.status | default('active') }}"
+      assigned_object:
+        name: "{{ __netbox_device_interface_pair.1.name }}"
+        device: "{{ __netbox_device_interface_pair.0.name }}"
+    state: present
+  loop: "{{ __netbox_device_interface_pair.1.ip_addresses | default([]) }}"
+  register: __netbox_ip_results
+
+- name: "Set primary IPv4 on {{ __netbox_device_interface_pair.0.name }}"
+  netbox.netbox.netbox_device:
+    data:
+      name: "{{ __netbox_device_interface_pair.0.name }}"
+      primary_ip4: "{{ __ip_result.ip_address.id }}"
+    state: present
+  loop: "{{ __netbox_ip_results.results }}"
+  loop_control:
+    loop_var: __ip_result
+  when: __ip_result.item.is_primary | default(false)

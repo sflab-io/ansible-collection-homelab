@@ -1,0 +1,44 @@
+---
+argument_specs:
+  main:
+    short_description: Self-Signed Certificate with CA Role
+    description:
+      - This role generates a self-signed TLS certificate with a CA role.
+    author:
+      - Sebastian Freund
+    options:
+      cert_common_name:
+        type: str
+        required: true
+        description:
+          - The common name (CN) for the certificate.
+      cert_organization_name:
+        type: str
+        required: false
+        default: "Self-Signed Organisation"
+        description:
+          - The organization name (O) for the certificate.
+      cert_subject_alt_name:
+        type: list
+        elements: str
+        required: true
+        description:
+          - A list of subject alternative names (SANs) for the certificate.
+          - Each entry should be in the format accepted by the **community.crypto.x509_certificate** module, e.g., "DNS:example.com", "IP:127.0.0.1".
+      cert_ownca_not_after:
+        type: str
+        default: +3650d
+        description:
+          - The date and time when the CA certificate will expire.
+          - Refer to the **community.crypto.x509_certificate** module for the format.
+          - If not provided, the CA certificate will expire in 3650 days.
+      cert_private_key_path:
+        type: str
+        required: true
+        description:
+          - The file path where the private key will be stored if **cert_private_key_to_file** is set to true.
+      cert_certificate_path:
+        type: str
+        required: true
+        description:
+          - The file path where the self-signed CA certificate will be stored.

@@ -1,0 +1,42 @@
+---
+- name: Create home directory
+  ansible.builtin.file:
+    path: "{{ vault_home_directory }}"
+    owner: "{{ vault_user }}"
+    group: "{{ vault_group }}"
+    mode: "0750"
+    state: directory
+
+- name: Create configuration directory
+  ansible.builtin.file:
+    path: "{{ vault_config_directory }}"
+    owner: "{{ vault_user }}"
+    group: "{{ vault_group }}"
+    mode: "0750"
+    state: directory
+
+- name: Create log directory
+  ansible.builtin.file:
+    path: "{{ vault_log_directory }}"
+    owner: "{{ vault_user }}"
+    group: "{{ vault_group }}"
+    mode: "0750"
+    state: directory
+
+- name: Create plugin directory
+  ansible.builtin.file:
+    path: "{{ vault_plugin_directory }}"
+    owner: "{{ vault_user }}"
+    group: "{{ vault_group }}"
+    mode: "0755"
+    state: directory
+
+- name: Create raft data directory
+  when:
+    - vault_backend == 'raft'
+  ansible.builtin.file:
+    path: "{{ vault_raft_data_directory }}"
+    owner: "{{ vault_user }}"
+    group: "{{ vault_group }}"
+    mode: "0750"
+    state: directory
