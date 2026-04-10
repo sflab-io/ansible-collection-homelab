@@ -3,9 +3,10 @@
   ansible.builtin.import_tasks: validate.yml
 
 - name: Create local directories
-  file:
+  ansible.builtin.file:
     state: directory
     path: "{{ item }}"
+    mode: "0755"
   with_items:
     - "{{ cert_private_key_path | dirname }}"
     - "{{ cert_certificate_path | dirname }}"

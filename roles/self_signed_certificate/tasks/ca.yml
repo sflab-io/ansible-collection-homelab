@@ -5,11 +5,11 @@
   loop:
     - "{{ vault_tls_directory }}/ca.key"
     - "{{ vault_tls_directory }}/ca.crt"
-  register: __ca_files
+  register: self_signed_certificate_ca_files
 
 # Generate Certificate Authority (CA) self-signed certificate
 - name: Generate Certificate Authority (CA) self-signed certificate
-  when: (__ca_files.results | selectattr('stat.exists', 'equalto', false) | list | length) > 0
+  when: (self_signed_certificate_ca_files.results | selectattr('stat.exists', 'equalto', false) | list | length) > 0
   block:
     - name: Generate Root CA private key
       community.crypto.openssl_privatekey:
@@ -25,12 +25,12 @@
         organization_name: "{{ self_signed_certificate_organization_name }}"
         basic_constraints:
           - CA:TRUE
-        basic_constraints_critical: yes
+        basic_constraints_critical: true
         key_usage:
           - keyCertSign
           - digitalSignature
           - cRLSign
-        key_usage_critical: yes
+        key_usage_critical: true
         owner: "{{ self_signed_certificate_vault_user }}"
         group: "{{ self_signed_certificate_vault_group }}"
 
@@ -44,7 +44,7 @@
         group: "{{ self_signed_certificate_vault_group }}"
 
     - name: Clean up intermediate files
-      file:
+      ansible.builtin.file:
         path: "{{ item }}"
         state: absent
       with_items:
