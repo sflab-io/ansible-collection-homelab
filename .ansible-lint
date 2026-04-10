@@ -1,0 +1,7 @@
+---
+# Ansible-lint configuration
+# yaml[comments] is skipped because Prettier (enforced via pre-commit) formats
+# inline comments with 1 space, which conflicts with ansible-lint's 2-space requirement.
+# Prettier takes precedence as it runs on every commit.
+skip_list:
+  - yaml[comments]
