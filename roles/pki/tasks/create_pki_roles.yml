@@ -17,7 +17,7 @@
 #         pki_vault_certificate_ttl_30: {{ pki_vault_certificate_ttl_30 }}
 #         pki_vault_domain: {{ pki_vault_domain }}
 
-- name: Creates a PKI role for {{ pki_vault_certificate_ttl_30 }} certificates
+- name: Create PKI role for certificates - {{ pki_vault_certificate_ttl_30 }}
   sflab.homelab.vault_pki_role:
     url: "{{ __pki_vault_url }}"
     auth_method: "token"

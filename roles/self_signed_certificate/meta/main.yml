@@ -1,7 +1,6 @@
 ---
 galaxy_info:
   author: Sebastian Freund
-  namespace: sflab.homelab
   role_name: self_signed_certificate
   description: |
     This role generates a self-signed TLS certificate with a CA.

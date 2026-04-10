@@ -14,18 +14,18 @@
     - name: Generate host/internal domain private key
       community.crypto.openssl_privatekey:
         path: "{{ vault_tls_directory }}/{{ cert_common_name }}.key"
-        owner: "{{ cert_vault_user }}"
-        group: "{{ cert_vault_group }}"
+        owner: "{{ self_signed_certificate_vault_user }}"
+        group: "{{ self_signed_certificate_vault_group }}"
 
     - name: Generate host/internal domain CSR
       community.crypto.openssl_csr:
         path: "{{ vault_tls_directory }}/{{ cert_common_name }}.csr"
         privatekey_path: "{{ vault_tls_directory }}/{{ cert_common_name }}.key"
         common_name: "{{ cert_common_name }}"
-        organization_name: "{{ cert_organization_name }}"
+        organization_name: "{{ self_signed_certificate_organization_name }}"
         subject_alt_name: "{{ cert_subject_alt_name }}"
-        owner: "{{ cert_vault_user }}"
-        group: "{{ cert_vault_group }}"
+        owner: "{{ self_signed_certificate_vault_user }}"
+        group: "{{ self_signed_certificate_vault_group }}"
 
     - name: Generate host/internal domain certificate (with own self-signed CA)
       community.crypto.x509_certificate:
@@ -33,10 +33,10 @@
         csr_path: "{{ vault_tls_directory }}/{{ cert_common_name }}.csr"
         ownca_path: "{{ vault_tls_directory }}/ca.crt"
         ownca_privatekey_path: "{{ vault_tls_directory }}/ca.key"
-        ownca_not_after: "{{ cert_ownca_not_after }}"
+        ownca_not_after: "{{ self_signed_certificate_ownca_not_after }}"
         provider: ownca
-        owner: "{{ cert_vault_user }}"
-        group: "{{ cert_vault_group }}"
+        owner: "{{ self_signed_certificate_vault_user }}"
+        group: "{{ self_signed_certificate_vault_group }}"
 
     # This is the certificate for actual deployment, with full chain of trust
     # https://www.digicert.com/ssl-support/pem-ssl-creation.htm
@@ -55,8 +55,8 @@
         content: "{{ (__hostonly_cert.content | b64decode) }}{{ (__ca_cert.content | b64decode) }}"
         dest: "{{ vault_tls_directory }}/{{ cert_common_name }}.crt"
         mode: "0644"
-        owner: "{{ cert_vault_user }}"
-        group: "{{ cert_vault_group }}"
+        owner: "{{ self_signed_certificate_vault_user }}"
+        group: "{{ self_signed_certificate_vault_group }}"
 
     - name: Clean up intermediate files
       file:

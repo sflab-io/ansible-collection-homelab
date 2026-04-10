@@ -12,14 +12,14 @@
 
 - name: Create user vault if not exists
   ansible.builtin.user:
-    name: "{{ cert_vault_user }}"
+    name: "{{ self_signed_certificate_vault_user }}"
     state: present
     create_home: false
     shell: "/sbin/nologin"
 
 - name: Create group vault if not exists
   ansible.builtin.group:
-    name: "{{ cert_vault_group }}"
+    name: "{{ self_signed_certificate_vault_group }}"
     state: present
 
 - name: Incluse task to generate CA certificate

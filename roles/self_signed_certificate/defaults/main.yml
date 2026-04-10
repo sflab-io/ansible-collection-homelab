@@ -1,5 +1,5 @@
 ---
-cert_organization_name: "Self-Signed Organisation"
-cert_ownca_not_after: "+3650d"
-cert_vault_user: vault
-cert_vault_group: vault
+self_signed_certificate_organization_name: "Self-Signed Organisation"
+self_signed_certificate_ownca_not_after: "+3650d"
+self_signed_certificate_vault_user: vault
+self_signed_certificate_vault_group: vault

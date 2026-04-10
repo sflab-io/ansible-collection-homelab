@@ -14,15 +14,15 @@
     - name: Generate Root CA private key
       community.crypto.openssl_privatekey:
         path: "{{ vault_tls_directory }}/ca.key"
-        owner: "{{ cert_vault_user }}"
-        group: "{{ cert_vault_group }}"
+        owner: "{{ self_signed_certificate_vault_user }}"
+        group: "{{ self_signed_certificate_vault_group }}"
 
     - name: Generate Root CA CSR
       community.crypto.openssl_csr:
         path: "{{ vault_tls_directory }}/ca.csr"
         privatekey_path: "{{ vault_tls_directory }}/ca.key"
         common_name: "{{ cert_common_name }}"
-        organization_name: "{{ cert_organization_name }}"
+        organization_name: "{{ self_signed_certificate_organization_name }}"
         basic_constraints:
           - CA:TRUE
         basic_constraints_critical: yes
@@ -31,8 +31,8 @@
           - digitalSignature
           - cRLSign
         key_usage_critical: yes
-        owner: "{{ cert_vault_user }}"
-        group: "{{ cert_vault_group }}"
+        owner: "{{ self_signed_certificate_vault_user }}"
+        group: "{{ self_signed_certificate_vault_group }}"
 
     - name: Generate Root CA certificate
       community.crypto.x509_certificate:
@@ -40,8 +40,8 @@
         privatekey_path: "{{ vault_tls_directory }}/ca.key"
         csr_path: "{{ vault_tls_directory }}/ca.csr"
         provider: selfsigned
-        owner: "{{ cert_vault_user }}"
-        group: "{{ cert_vault_group }}"
+        owner: "{{ self_signed_certificate_vault_user }}"
+        group: "{{ self_signed_certificate_vault_group }}"
 
     - name: Clean up intermediate files
       file:

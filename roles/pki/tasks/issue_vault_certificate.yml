@@ -57,11 +57,16 @@
 - name: Calculate certificate expiration time
   when: __pki_vault_cert_stat.stat.exists
   ansible.builtin.set_fact:
-    __pki_vault_cert_days_remaining: "{{ ((__pki_vault_cert_info.not_after | to_datetime('%Y%m%d%H%M%SZ')) - (ansible_facts['date_time'].iso8601 | to_datetime('%Y-%m-%dT%H:%M:%SZ'))).days }}"
+    __pki_vault_cert_days_remaining: >-
+      {{ ((__pki_vault_cert_info.not_after | to_datetime('%Y%m%d%H%M%SZ'))
+      - (ansible_facts['date_time'].iso8601 | to_datetime('%Y-%m-%dT%H:%M:%SZ'))).days }}
 
 - name: Determine if certificate renewal is needed
   ansible.builtin.set_fact:
-    __pki_vault_cert_needs_renewal: "{{ __pki_vault_cert_issuer != pki_intermediate_common_name or not __pki_vault_cert_stat.stat.exists or (__pki_vault_cert_days_remaining | default(0) | int) < (pki_vault_certificate_renewal_days | int) }}"
+    __pki_vault_cert_needs_renewal: >-
+      {{ __pki_vault_cert_issuer != pki_intermediate_common_name
+      or not __pki_vault_cert_stat.stat.exists
+      or (__pki_vault_cert_days_remaining | default(0) | int) < (pki_vault_certificate_renewal_days | int) }}
 
 - name: Display certificate renewal status
   ansible.builtin.debug:

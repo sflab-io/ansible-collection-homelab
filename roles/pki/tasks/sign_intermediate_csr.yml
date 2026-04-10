@@ -28,7 +28,7 @@
     csr: "{{ __pki_intermediate_csr.csr }}"
     common_name: "{{ pki_intermediate_common_name }}"
     ttl: "{{ pki_intermediate_default_lease_ttl }}" # 5 Jahre
-  register: signed_cert
+  register: pki_signed_cert
 
 # - name: Display PKI intermediate signing status
 #   ansible.builtin.debug:
@@ -43,8 +43,8 @@
     auth_method: "token"
     token: "{{ __pki_vault_init_data.root_token }}"
     engine_mount_point: "{{ pki_intermediate_mount_point }}"
-    certificate: "{{ signed_cert.certificate }}"
-  register: set_signed_cert
+    certificate: "{{ pki_signed_cert.certificate }}"
+  register: pki_set_signed_cert
 # - name: Display PKI intermediate signing status
 #   ansible.builtin.debug:
 #     msg: |
