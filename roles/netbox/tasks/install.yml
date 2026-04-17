@@ -13,11 +13,16 @@
       LANGUAGE_CODE: "en-us"
       PLUGINS:
         - nextbox_ui_plugin
+        - netbox_acls
       PLUGINS_CONFIG:
         nextbox_ui_plugin:
           INITIAL_LAYOUT: auto
+        netbox_acls:
+          top_level_menu: true
+          rule_sequence_step: 10
     netbox_local_requirements:
       - nextbox-ui-plugin
+      - netbox-acls
     netbox_setup_web_frontend: true
 
 # Run migrations before the external role to handle cases where configuration
