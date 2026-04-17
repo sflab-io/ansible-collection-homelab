@@ -11,6 +11,13 @@
         - 127.0.0.1
       TIME_ZONE: "Europe/Berlin"
       LANGUAGE_CODE: "en-us"
+      PLUGINS:
+        - nextbox_ui_plugin
+      PLUGINS_CONFIG:
+        nextbox_ui_plugin:
+          INITIAL_LAYOUT: auto
+    netbox_local_requirements:
+      - nextbox-ui-plugin
     netbox_setup_web_frontend: true
 
 # Run migrations before the external role to handle cases where configuration
