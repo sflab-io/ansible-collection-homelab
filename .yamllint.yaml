@@ -8,6 +8,13 @@ rules:
     check-keys: false
   document-start: disable
   comments-indentation: disable
+  comments:
+    min-spaces-from-content: 1
+  braces:
+    max-spaces-inside: 1
+  octal-values:
+    forbid-implicit-octal: true
+    forbid-explicit-octal: true
 ignore: |
   vendor/
   .dagger/

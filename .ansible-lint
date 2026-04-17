@@ -3,6 +3,9 @@
 # yaml[comments] is skipped because Prettier (enforced via pre-commit) formats
 # inline comments with 1 space, which conflicts with ansible-lint's 2-space requirement.
 # Prettier takes precedence as it runs on every commit.
+# offline: true prevents ansible-galaxy collection install from running,
+# which is needed in isolated/containerized environments without internet access.
+offline: true
 skip_list:
   - yaml[comments]
   - no-handler

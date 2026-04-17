@@ -8,11 +8,6 @@ python.uv_venv_auto = true
 [env]
 PROJECT_NAME = "{{ config_root | basename }}"
 
-# _.file = [
-#   { path = "{{env.HOME}}/.env", optional = true },
-#   { path = ".env", optional = true },
-#   { path = ".creds.env.yaml", redact = true }
-# ]
 _.python.venv = { path = ".venv", create = true }
 
 [hooks]
@@ -22,7 +17,7 @@ enter = [
   #
   'mise i -q',
   #
-  'pre-commit install -f --hook-type pre-commit',
+  'mise run pre-commit:install',
   #
   'mise run python:install-requirements',
 ]
