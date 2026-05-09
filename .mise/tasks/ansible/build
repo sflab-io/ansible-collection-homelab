@@ -27,6 +27,6 @@ rsync -a \
 # Step 1: Build the collection archive and export it
 dagger \
     -m github.com/stuttgart-things/dagger/ansible@v0.84.0 \
-    call build \
+    call --progress=plain build \
     --src "${TMPDIR}" \
     export --path "${MISE_CONFIG_ROOT}/dist"
