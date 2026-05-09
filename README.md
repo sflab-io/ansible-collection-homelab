@@ -127,7 +127,7 @@ ansible-galaxy collection install sflab.homelab --upgrade
 ### Prerequisites
 
 - [mise](https://mise.jdx.dev) — manages Python, uv, and Dagger versions
-- [Dagger](https://dagger.io) v0.20.3 — containerized build and release (installed via mise)
+- [Dagger](https://dagger.io) v0.20.8 — containerized build and release (installed via mise)
 - Python 3.x
 
 ### Setup

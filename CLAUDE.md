@@ -19,7 +19,7 @@ This is `sflab.homelab`, an Ansible Collection for managing homelab infrastructu
 - **Ansible 2.15+** - Collection minimum version (defined in `meta/runtime.yml`)
 - **ansible-galaxy** - For building and installing collections
 - **mise** - Tool version manager (manages uv, Python, and Dagger)
-- **Dagger v0.20.3** - Used for containerized builds and releases (managed via mise)
+- **Dagger v0.20.8** - Used for containerized builds and releases (managed via mise)
 
 ### Installing Development Dependencies
 

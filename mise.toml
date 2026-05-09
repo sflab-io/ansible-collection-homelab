@@ -1,5 +1,5 @@
 [tools]
-dagger = "0.20.3"
+"aqua:dagger" = "latest"
 uv = "latest"
 
 [settings]
