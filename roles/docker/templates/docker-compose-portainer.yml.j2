@@ -21,7 +21,7 @@ services:
     security_opt:
       - no-new-privileges:true
     networks:
-      - proxy
+      - {{ docker_traefik_proxy_network }}
     environment:
       # Timezone for proper log timestamps
       - TZ=Europe/Berlin
@@ -54,7 +54,7 @@ services:
 # Networks
 networks:
   # Use the existing proxy network created by Traefik
-  proxy:
+  {{ docker_traefik_proxy_network }}:
     external: true
 
 # Volumes

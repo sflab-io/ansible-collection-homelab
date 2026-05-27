@@ -24,7 +24,7 @@ services:
     security_opt:
       - no-new-privileges:true
     networks:
-      - proxy
+      - {{ docker_traefik_proxy_network }}
     ports:
       # HTTP port - Required for ACME HTTP-01 challenge and redirect to HTTPS
       - "80:80"
@@ -51,7 +51,7 @@ services:
       - "--providers.docker=true"
       # Do not expose containers by default - require explicit traefik.enable=true label
       - "--providers.docker.exposedbydefault=false"
-      - "--providers.docker.network=proxy"
+      - "--providers.docker.network={{ docker_traefik_proxy_network }}"
 
       # Entry points configuration
       # Web entry point (HTTP) - Used for ACME HTTP-01 challenge and redirect to HTTPS
@@ -114,6 +114,6 @@ services:
 networks:
   # Dedicated proxy network for Traefik and backend services
   # All services that need to be exposed via Traefik should be on this network
-  proxy:
-    name: proxy
+  {{ docker_traefik_proxy_network }}:
+    name: {{ docker_traefik_proxy_network }}
     driver: bridge

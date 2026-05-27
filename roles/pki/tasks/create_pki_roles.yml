@@ -7,16 +7,6 @@
 # - Root CA PKI secret engine must be enabled
 #
 
-# - name: Debug variables
-#   ansible.builtin.debug:
-#     msg: |
-#       Configuring PKI Intermediate CA with the following parameters:
-#         __pki_vault_url: {{ __pki_vault_url }}
-#         pki_intermediate_mount_point: {{ pki_intermediate_mount_point }}
-#         pki_vault_certificate_role_30: {{ pki_vault_certificate_role_30 }}
-#         pki_vault_certificate_ttl_30: {{ pki_vault_certificate_ttl_30 }}
-#         pki_vault_domain: {{ pki_vault_domain }}
-
 - name: Create PKI role for certificates - {{ pki_vault_certificate_ttl_30 }}
   sflab.homelab.vault_pki_role:
     url: "{{ __pki_vault_url }}"

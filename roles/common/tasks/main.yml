@@ -1,7 +1,7 @@
 ---
 - name: Set hostname
   ansible.builtin.hostname:
-    name: "{{ common_hostname }}"
+    name: "{{ ansible_host }}"
 
 - name: Disable cloud-init manage_etc_hosts
   ansible.builtin.lineinfile:

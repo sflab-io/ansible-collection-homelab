@@ -52,8 +52,8 @@ pki_vault_certificate_key_path: "{{ pki_vault_tls_directory }}/vault.key"
 pki_vault_certificate_fullchain_path: "{{ pki_vault_tls_directory }}/vault-fullchain.crt"
 
 # Certificate specification
-pki_vault_certificate_common_name: "vault.{{ pki_vault_domain }}"
+pki_vault_certificate_common_name: "{{ ansible_host }}"
 pki_vault_certificate_alt_names:
-  - "vault.{{ pki_vault_domain }}"
+  - "{{ ansible_host }}"
 pki_vault_certificate_ip_sans:
   - "{{ ansible_facts['default_ipv4']['address'] }}"
