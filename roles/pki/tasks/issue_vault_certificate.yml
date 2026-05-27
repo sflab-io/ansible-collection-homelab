@@ -86,6 +86,7 @@
         url: "{{ __pki_vault_url }}"
         auth_method: "token"
         token: "{{ __pki_vault_init_data.root_token }}"
+        validate_certs: "{{ pki_vault_api_validate_certs }}"
         path: "{{ pki_intermediate_mount_point }}/issue/{{ pki_vault_certificate_role_30 }}"
         data:
           common_name: "{{ pki_vault_certificate_common_name }}"

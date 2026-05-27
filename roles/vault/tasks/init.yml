@@ -50,6 +50,7 @@
     url: "{{ vault_api_protocol }}://{{ ansible_facts['default_ipv4']['address'] }}:{{ vault_api_port }}"
     secret_shares: 5
     secret_threshold: 3
+    validate_certs: "{{ vault_api_validate_certs }}"
   register: vault_init_result
   when: not __vault_init_status.json.initialized
 
@@ -80,6 +81,7 @@
   sflab.homelab.vault_unseal:
     url: "{{ vault_api_protocol }}://{{ ansible_facts['default_ipv4']['address'] }}:{{ vault_api_port }}"
     unseal_keys: "{{ vault_init_result.keys_base64[:3] }}"
+    validate_certs: "{{ vault_api_validate_certs }}"
   when:
     - vault_seal_status.json.sealed
     - vault_init_result is defined

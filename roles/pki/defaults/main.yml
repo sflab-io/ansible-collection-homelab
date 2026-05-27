@@ -5,6 +5,7 @@ pki_vault_domain: "{{ domain }}"
 pki_vault_api_protocol: "https" # Change to "https" after TLS is enabled
 pki_vault_api_host: "{{ ansible_facts['fqdn'] }}"
 pki_vault_api_port: 8200
+pki_vault_api_validate_certs: false
 
 # Path to vault init data file (created by vault role)
 pki_vault_init_data_file: "/etc/vault.d/vault-init-data.json"

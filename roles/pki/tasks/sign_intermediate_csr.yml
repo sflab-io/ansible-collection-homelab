@@ -24,6 +24,7 @@
     url: "{{ __pki_vault_url }}"
     auth_method: "token"
     token: "{{ __pki_vault_init_data.root_token }}"
+    validate_certs: "{{ pki_vault_api_validate_certs }}"
     engine_mount_point: "{{ pki_root_mount_point }}" # Mount-Punkt der ROOT CA
     csr: "{{ __pki_intermediate_csr.csr }}"
     common_name: "{{ pki_intermediate_common_name }}"
@@ -42,6 +43,7 @@
     url: "{{ __pki_vault_url }}"
     auth_method: "token"
     token: "{{ __pki_vault_init_data.root_token }}"
+    validate_certs: "{{ pki_vault_api_validate_certs }}"
     engine_mount_point: "{{ pki_intermediate_mount_point }}"
     certificate: "{{ pki_signed_cert.certificate }}"
   register: pki_set_signed_cert

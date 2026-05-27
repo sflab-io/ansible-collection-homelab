@@ -1,4 +1,8 @@
 ---
+- name: Include role geerlin
+  ansible.builtin.include_role:
+    name: geerlingguy.docker
+
 - name: Include task to deploy traefik configuration
   ansible.builtin.include_tasks: traefik.yml
   when: docker_deploy_traefik | bool

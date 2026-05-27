@@ -20,6 +20,7 @@
     url: "{{ __pki_vault_url }}"
     auth_method: "token"
     token: "{{ __pki_vault_init_data.root_token }}"
+    validate_certs: "{{ pki_vault_api_validate_certs }}"
     engine_mount_point: "{{ pki_root_mount_point }}"
     common_name: "{{ pki_root_common_name }}"
   no_log: true # Token in parameters
@@ -37,6 +38,7 @@
     url: "{{ __pki_vault_url }}"
     auth_method: "token"
     token: "{{ __pki_vault_init_data.root_token }}"
+    validate_certs: "{{ pki_vault_api_validate_certs }}"
     path: "{{ pki_root_mount_point }}/config/cluster"
     data:
       path: "{{ __pki_vault_url }}/v1/{{ pki_root_mount_point }}"
@@ -47,6 +49,7 @@
     url: "{{ __pki_vault_url }}"
     auth_method: "token"
     token: "{{ __pki_vault_init_data.root_token }}"
+    validate_certs: "{{ pki_vault_api_validate_certs }}"
     path: "{{ pki_root_mount_point }}/config/urls"
     data:
       # Use templated URLs for issuing certificates, CRL distribution points, and OCSP servers
