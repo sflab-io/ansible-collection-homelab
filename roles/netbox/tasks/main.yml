@@ -7,3 +7,10 @@
 
 - name: Include task from install.yml
   ansible.builtin.include_tasks: install.yml
+
+- name: Apply NetBox runtime configuration
+  ansible.builtin.include_tasks: configure.yml
+
+- name: Create NetBox API token and store in Vault
+  when: netbox_create_api_token | bool
+  ansible.builtin.include_tasks: create_api_token.yml

@@ -1,2 +1,33 @@
 ---
 # defaults file for sflab.homelab.netbox
+
+# --- NetBox configuration ---
+# Pepper used for hashing API tokens (required in NetBox v4+).
+# Must be a stable, random secret – store encrypted (e.g. SOPS).
+# Changing this value invalidates all existing API tokens.
+netbox_api_token_pepper: ""
+
+# --- API Token creation ---
+# Set to true to automatically create a NetBox API token and store it in Vault KV.
+netbox_create_api_token: false
+
+# NetBox admin username for which the API token is created.
+netbox_api_token_admin_username: "admin"
+
+# Description stored on the NetBox token object (used as get_or_create key).
+netbox_api_token_description: "Ansible automation token"
+
+# --- Vault connection (required when netbox_create_api_token: true) ---
+netbox_vault_api_protocol: "https"
+netbox_vault_api_host: "vault.home.sflab.io"
+netbox_vault_api_port: 8200
+netbox_vault_validate_certs: false
+# Vault AppRole credentials (required when netbox_create_api_token: true).
+netbox_vault_role_id: ""
+netbox_vault_secret_id: ""
+
+# KV v2 engine mount point (must already exist in Vault).
+netbox_vault_kv_engine_name: "secrets_homelab"
+
+# Path inside the KV engine where the token is stored.
+netbox_vault_kv_path: "netbox"

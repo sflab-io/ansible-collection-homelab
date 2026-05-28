@@ -4,11 +4,67 @@
 argument_specs:
   main:
     short_description: Deploy and configure Netbox server
-    # options:
-    #   docker_reverse_proxy_type:
-    #     type: str
-    #     description: Type of reverse proxy to deploy (traefik or caddy).
-    #     default: "caddy"
-    #     choices:
-    #       - traefik
-    #       - caddy
+    options:
+      netbox_api_token_pepper:
+        type: str
+        description: >-
+          Random secret used by NetBox v4+ to pepper (hash) API tokens.
+          Must be stable – changing it invalidates all existing tokens.
+          Should be stored encrypted (e.g. via SOPS). Required.
+        default: ""
+
+      netbox_create_api_token:
+        type: bool
+        description: >-
+          When true, creates a NetBox API token for the admin user via Django shell
+          and stores it in HashiCorp Vault KV. Requires Vault connection variables.
+        default: false
+
+      netbox_api_token_admin_username:
+        type: str
+        description: NetBox admin username for which the API token is created.
+        default: "admin"
+
+      netbox_api_token_description:
+        type: str
+        description: >-
+          Description stored on the NetBox token object.
+          Also acts as the get_or_create key inside NetBox to keep the operation idempotent.
+        default: "Ansible automation token"
+
+      netbox_vault_api_protocol:
+        type: str
+        description: Protocol used to reach the Vault API (http or https).
+        default: "https"
+
+      netbox_vault_api_host:
+        type: str
+        description: >-
+          Hostname or IP of the Vault server. Required when netbox_create_api_token is true.
+        default: ""
+
+      netbox_vault_api_port:
+        type: int
+        description: Port of the Vault API.
+        default: 8200
+
+      netbox_vault_validate_certs:
+        type: bool
+        description: Whether to validate the Vault TLS certificate.
+        default: false
+
+      netbox_vault_token:
+        type: str
+        description: >-
+          Vault token with write access to the KV engine.
+          Defaults to the VAULT_TOKEN environment variable.
+
+      netbox_vault_kv_engine_name:
+        type: str
+        description: KV v2 engine mount point (must already exist in Vault).
+        default: "secrets_homelab"
+
+      netbox_vault_kv_path:
+        type: str
+        description: Path inside the KV engine where the token is written.
+        default: "netbox/api_token"

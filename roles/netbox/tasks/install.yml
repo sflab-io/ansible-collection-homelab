@@ -11,6 +11,8 @@
         - 127.0.0.1
       TIME_ZONE: "Europe/Berlin"
       LANGUAGE_CODE: "en-us"
+      API_TOKEN_PEPPERS:
+        1: "{{ netbox_api_token_pepper }}"
       PLUGINS:
         - nextbox_ui_plugin
         - netbox_acls
