@@ -5,11 +5,15 @@
 - name: Include task from redis.yml
   ansible.builtin.include_tasks: redis.yml
 
-- name: Include task from install.yml
-  ansible.builtin.include_tasks: install.yml
+- name: Include task from role gmazoyer.netbox
+  ansible.builtin.include_role:
+    name: gmazoyer.netbox
 
 - name: Apply NetBox runtime configuration
   ansible.builtin.include_tasks: configure.yml
+
+- name: Apply database migrations and collect static files
+  ansible.builtin.include_tasks: migrate.yml
 
 - name: Create NetBox API token and store in Vault
   when: netbox_create_api_token | bool

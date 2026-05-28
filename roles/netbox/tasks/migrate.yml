@@ -1,0 +1,25 @@
+---
+# Führt Datenbankmigrationen und Static-File-Sammlung durch.
+# Läuft bewusst NACH configure.yml, damit configuration.py vollständig ist –
+# insbesondere API_TOKEN_PEPPERS mit korrekten Integer-Schlüsseln (via blockinfile).
+#
+# gmazoyer.netbox führt Migrationen nur bei Git-Codeänderungen aus.
+# Diese Tasks sind idempotent: bei keinen ausstehenden Migrationen beendet sich der
+# Befehl schnell.
+
+- name: Perform database migration
+  community.general.django_manage:
+    app_path: "{{ netbox_install_directory | default('/opt/netbox') }}/netbox"
+    command: migrate
+    virtualenv: "{{ netbox_virtualenv_path | default('/opt/netbox/venv') }}"
+  become: true
+  become_user: "{{ netbox_user | default('netbox') }}"
+
+- name: Collect static files
+  community.general.django_manage:
+    app_path: "{{ netbox_install_directory | default('/opt/netbox') }}/netbox"
+    command: collectstatic
+    clear: true
+    virtualenv: "{{ netbox_virtualenv_path | default('/opt/netbox/venv') }}"
+  become: true
+  become_user: "{{ netbox_user | default('netbox') }}"
