@@ -1,6 +1,20 @@
 ---
 # defaults file for sflab.homelab.netbox_init
 
-# NetBox connection (override in inventory/group_vars)
-netbox_init_url: "http://127.0.0.1"
-# netbox_init_token: ""  # must be set in inventory, vault, or extra-vars
+# NetBox connection must be set in inventory, vault, or extra-vars
+netbox_url: ""
+netbox_init_token: ""
+
+netbox_vault_api_protocol: "https"
+netbox_vault_api_host: "vault.home.sflab.io"
+netbox_vault_api_port: 8200
+netbox_vault_validate_certs: false
+# Vault AppRole credentials (required when netbox_create_api_token: true).
+netbox_vault_role_id: ""
+netbox_vault_secret_id: ""
+
+# KV v2 engine mount point (must already exist in Vault).
+netbox_vault_kv_engine_name: "secrets_homelab"
+
+# Path inside the KV engine where the token is stored.
+netbox_vault_kv_path: "netbox"

@@ -3,7 +3,7 @@
 
 argument_specs:
   main:
-    short_description: Deploy and configure Netbox server
+    short_description: Initialize NetBox with default data.
     # options:
     #   docker_reverse_proxy_type:
     #     type: str

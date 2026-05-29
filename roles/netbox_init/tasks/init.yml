@@ -12,12 +12,6 @@
 
 # --- Initialize NetBox sites, regions and tenant informations ---
 
-# - name: Debug print message to indicate start of NetBox initialization
-#   ansible.builtin.debug:
-#     msg: |
-#       netbox_url: "http://127.0.0.1"
-#       netbox_token: "{{ lookup('env', 'NETBOX_TOKEN') }}"
-
 - name: "Create NetBox regions"
   netbox.netbox.netbox_region:
     data:
