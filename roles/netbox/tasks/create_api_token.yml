@@ -36,13 +36,17 @@
   delegate_to: localhost
   no_log: true
 
+- name: Set fact indicating whether token creation is needed
+  ansible.builtin.set_fact:
+    __netbox_token_creation_needed: "{{ __netbox_vault_token_check.failed or __netbox_vault_token_check.data.data is not defined or __netbox_vault_token_check.data.data == '' }}"
+
 - name: Skip token creation — token already stored in Vault
-  when: not __netbox_vault_token_check.failed
+  when: not __netbox_token_creation_needed
   ansible.builtin.debug:
     msg: "NetBox API token already exists in Vault at {{ netbox_vault_kv_engine_name }}/{{ netbox_vault_kv_path }}, skipping creation."
 
 - name: Create and store NetBox API token
-  when: __netbox_vault_token_check.failed
+  when: __netbox_token_creation_needed
   block:
     - name: Provision NetBox API token via REST API
       ansible.builtin.uri:
