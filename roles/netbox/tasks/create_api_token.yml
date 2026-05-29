@@ -1,14 +1,21 @@
 ---
 #
-# This task file creates a NetBox API token via Django shell and stores it in Vault KV.
+# This task file creates a NetBox API token via the REST API and stores it in Vault KV.
 #
 # Idempotency: Checks Vault KV for an existing token before creating a new one.
 #              If a token already exists in Vault, the task is skipped entirely.
-#              Inside NetBox, Token.objects.get_or_create() ensures no duplicates.
+#              A new token is only provisioned when Vault has no entry yet.
+#
+# Why REST API instead of Django shell:
+#   NetBox v4+ uses API_TOKEN_PEPPERS to hash tokens before storing them in the
+#   database. Tokens created via the Django shell bypass this mechanism and are
+#   stored as plain hex ("v1 tokens"), which NetBox then rejects with
+#   "Invalid v1 token". The /api/users/tokens/provision/ endpoint goes through
+#   the full authentication pipeline and correctly applies the pepper.
 #
 # Prerequisites:
-# - NetBox must be installed and the Django application must be available
-# - Vault must be reachable and configured with the appropriate KV engine and AppRole credentials
+# - NetBox must be running and reachable at netbox_api_url
+# - Vault must be reachable and configured with the KV engine and AppRole credentials
 #
 
 - name: Set Vault URL fact
@@ -29,7 +36,7 @@
   delegate_to: localhost
   no_log: true
 
-- name: Debug print message if token already exists in Vault
+- name: Skip token creation — token already stored in Vault
   when: not __netbox_vault_token_check.failed
   ansible.builtin.debug:
     msg: "NetBox API token already exists in Vault at {{ netbox_vault_kv_engine_name }}/{{ netbox_vault_kv_path }}, skipping creation."
@@ -37,32 +44,19 @@
 - name: Create and store NetBox API token
   when: __netbox_vault_token_check.failed
   block:
-    - name: Create NetBox API token via Django shell
-      ansible.builtin.command:
-        argv:
-          - "{{ netbox_virtualenv_path | default('/opt/netbox/venv') }}/bin/python"
-          - "{{ netbox_install_directory | default('/opt/netbox') }}/netbox/manage.py"
-          - "shell"
-          - "-c"
-          - |
-            from users.models import Token
-            from django.contrib.auth import get_user_model
-            user = get_user_model().objects.get(username='{{ netbox_api_token_admin_username }}')
-            token, created = Token.objects.get_or_create(
-                user=user, description='{{ netbox_api_token_description }}'
-            )
-            print(token.key)
-            print('CREATED' if created else 'EXISTING')
-      become: true
-      become_user: "{{ netbox_user | default('netbox') }}"
+    - name: Provision NetBox API token via REST API
+      ansible.builtin.uri:
+        url: "{{ netbox_api_url }}/api/users/tokens/provision/"
+        method: POST
+        body_format: json
+        body:
+          username: "{{ netbox_api_token_admin_username }}"
+          password: "{{ netbox_api_token_admin_password }}"
+          description: "{{ netbox_api_token_description }}"
+        status_code: [200, 201]
+        validate_certs: "{{ netbox_api_validate_certs }}"
       register: __netbox_api_token_result
-      changed_when: "'CREATED' in __netbox_api_token_result.stdout"
-      no_log: true
-
-    - name: Parse NetBox API token from command output
-      ansible.builtin.set_fact:
-        __netbox_api_token_key: "{{ __netbox_api_token_result.stdout_lines[0] }}"
-      no_log: true
+      changed_when: __netbox_api_token_result.status == 201
 
     - name: Store NetBox API token in Vault KV
       community.hashi_vault.vault_kv2_write:
@@ -74,7 +68,7 @@
         engine_mount_point: "{{ netbox_vault_kv_engine_name }}"
         path: "{{ netbox_vault_kv_path }}"
         data:
-          api_token: "{{ __netbox_api_token_key }}"
+          api_token: "nbt_{{ __netbox_api_token_result.json.key }}.{{ __netbox_api_token_result.json.token }}"
       delegate_to: localhost
       no_log: true
 

@@ -8,20 +8,33 @@
 netbox_api_token_pepper: ""
 
 # --- API Token creation ---
-# Set to true to automatically create a NetBox API token and store it in Vault KV.
+# Set to true to automatically create a NetBox API token via REST API and store it in Vault KV.
 netbox_create_api_token: false
 
 # NetBox admin username for which the API token is created.
 netbox_api_token_admin_username: "admin"
 
-# Description stored on the NetBox token object (used as get_or_create key).
+# NetBox admin password used for Basic Auth during token provisioning.
+# Required when netbox_create_api_token: true. Store encrypted (e.g. SOPS).
+netbox_api_token_admin_password: ""
+
+# Description stored on the NetBox token object.
 netbox_api_token_description: "Ansible automation token"
+
+# --- NetBox API connection (used for token provisioning) ---
+# Base URL of the NetBox REST API. When the task runs on the NetBox host itself,
+# localhost is sufficient and avoids DNS/TLS concerns.
+netbox_api_url: "http://127.0.0.1"
+
+# Whether to validate the NetBox TLS certificate during token provisioning.
+netbox_api_validate_certs: false
 
 # --- Vault connection (required when netbox_create_api_token: true) ---
 netbox_vault_api_protocol: "https"
 netbox_vault_api_host: "vault.home.sflab.io"
 netbox_vault_api_port: 8200
 netbox_vault_validate_certs: false
+
 # Vault AppRole credentials (required when netbox_create_api_token: true).
 netbox_vault_role_id: ""
 netbox_vault_secret_id: ""
