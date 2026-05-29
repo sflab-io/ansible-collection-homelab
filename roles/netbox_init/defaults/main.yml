@@ -17,4 +17,4 @@ netbox_vault_secret_id: ""
 netbox_vault_kv_engine_name: "secrets_homelab"
 
 # Path inside the KV engine where the token is stored.
-netbox_vault_kv_path: "netbox"
+netbox_vault_kv_path: "netbox_{{ env }}"
