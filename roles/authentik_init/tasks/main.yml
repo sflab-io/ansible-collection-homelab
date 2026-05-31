@@ -1,13 +1,28 @@
 ---
-- name: Debug print message
-  ansible.builtin.debug:
-    msg: |
-      netbox_url: "{{ netbox_url }}"
-      netbox_token: "{{ netbox_token }}"
-      authentik_url: "{{ authentik_url }}"
-      authentik_token: "{{ authentik_token }}"
-
 - name: Sync NetBox data to Authentik # noqa: args[module]
   sflab.homelab.authentik_users:
     state: present
+  delegate_to: localhost
+
+- name: Create OAuth2 provider for Portainer
+  sflab.homelab.authentik_provider:
+    name: "{{ authentik_portainer_provider_name }}"
+    authorization_flow: "{{ authentik_portainer_authorization_flow }}"
+    invalidation_flow: "{{ authentik_portainer_invalidation_flow }}"
+    redirect_uris:
+      - "{{ authentik_portainer_redirect_uri }}"
+    scopes: "{{ authentik_portainer_scopes }}"
+    signing_key: "{{ authentik_portainer_signing_key }}"
+    state: present
+    validate_certs: "{{ authentik_validate_certs }}"
+  delegate_to: localhost
+  register: authentik_portainer_provider
+
+- name: Create application for Portainer
+  sflab.homelab.authentik_application:
+    name: "{{ authentik_portainer_application_name }}"
+    slug: "{{ authentik_portainer_application_slug }}"
+    provider: "{{ authentik_portainer_provider_name }}"
+    state: present
+    validate_certs: "{{ authentik_validate_certs }}"
   delegate_to: localhost

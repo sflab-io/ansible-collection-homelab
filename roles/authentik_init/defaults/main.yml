@@ -1,2 +1,16 @@
 ---
 # defaults file for sflab.homelab.authentik_init
+
+authentik_validate_certs: true
+
+authentik_portainer_provider_name: "portainer"
+authentik_portainer_redirect_uri: "https://portainer.authentik.home.sflab.io/"
+authentik_portainer_authorization_flow: "default-provider-authorization-explicit-consent"
+authentik_portainer_invalidation_flow: "default-provider-invalidation-flow"
+authentik_portainer_signing_key: "authentik Self-signed Certificate"
+authentik_portainer_scopes:
+  - openid
+  - profile
+  - email
+authentik_portainer_application_name: "Portainer"
+authentik_portainer_application_slug: "portainer"

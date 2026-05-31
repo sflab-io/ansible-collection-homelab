@@ -49,6 +49,8 @@ The following Ansible collections are required and will be installed automatical
 ### Modules
 Name | Description
 --- | ---
+[sflab.homelab.authentik_application](https://github.com/sflab-io/ansible-collection-homelab/blob/main/docs/sflab.homelab.authentik_application_module.rst)|Manage applications in Authentik
+[sflab.homelab.authentik_provider](https://github.com/sflab-io/ansible-collection-homelab/blob/main/docs/sflab.homelab.authentik_provider_module.rst)|Manage OAuth2/OpenID Connect providers in Authentik
 [sflab.homelab.authentik_users](https://github.com/sflab-io/ansible-collection-homelab/blob/main/docs/sflab.homelab.authentik_users_module.rst)|Synchronizes NetBox contact groups and contacts to Authentik groups and users
 [sflab.homelab.vault_init](https://github.com/sflab-io/ansible-collection-homelab/blob/main/docs/sflab.homelab.vault_init_module.rst)|Initializes a HashiCorp Vault instance.
 [sflab.homelab.vault_kv_secret_engine](https://github.com/sflab-io/ansible-collection-homelab/blob/main/docs/sflab.homelab.vault_kv_secret_engine_module.rst)|Configures a KV secret engine in HashiCorp Vault
