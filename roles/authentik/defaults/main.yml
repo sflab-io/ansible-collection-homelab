@@ -1,0 +1,19 @@
+---
+# Set to true to automatically store Authentik API token in Vault KV. Requires Vault connection details and AppRole credentials to be set.
+authentik_store_api_token: false
+
+# --- Vault connection
+authentik_vault_api_protocol: "https"
+authentik_vault_api_host: "vault.home.sflab.io"
+authentik_vault_api_port: 8200
+authentik_vault_validate_certs: false
+
+# Vault AppRole credentials
+authentik_vault_role_id: ""
+authentik_vault_secret_id: ""
+
+# KV v2 engine mount point (must already exist in Vault).
+authentik_vault_kv_engine_name: "secrets_homelab"
+
+# Path inside the KV engine where the token is stored.
+authentik_vault_kv_path: "authentik"

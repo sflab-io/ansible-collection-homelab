@@ -3,13 +3,13 @@
 
 argument_specs:
   main:
-    short_description: Initialize Authentik
-    options:
-      authentik_init_url:
-        type: str
-        description: URL of the Authentik instance to initialize
-        required: true
-      authentik_init_token:
-        type: str
-        description: API token for authenticating with the Authentik instance to initialize
-        required: true
+    short_description: Initialize Authentik with data from NetBox
+    # options:
+    #   authentik_init_url:
+    #     type: str
+    #     description: URL of the Authentik instance to initialize
+    #     required: true
+    #   authentik_init_token:
+    #     type: str
+    #     description: API token for authenticating with the Authentik instance to initialize
+    #     required: true

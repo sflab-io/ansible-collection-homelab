@@ -1,0 +1,51 @@
+---
+#
+# This task file stores the Authentik API token in Vault KV if it doesn't already exists.
+
+- name: Set Vault URL fact
+  ansible.builtin.set_fact:
+    __authentik_vault_url: "{{ authentik_vault_api_protocol }}://{{ authentik_vault_api_host }}:{{ authentik_vault_api_port }}"
+
+- name: Check if Authentik API token already exists in Vault KV
+  community.hashi_vault.vault_kv2_get:
+    url: "{{ __authentik_vault_url }}"
+    auth_method: "approle"
+    role_id: "{{ authentik_vault_role_id }}"
+    secret_id: "{{ authentik_vault_secret_id }}"
+    validate_certs: "{{ authentik_vault_validate_certs }}"
+    engine_mount_point: "{{ authentik_vault_kv_engine_name }}"
+    path: "{{ authentik_vault_kv_path }}"
+  register: __authentik_vault_token_check
+  ignore_errors: true
+  delegate_to: localhost
+  no_log: true
+
+- name: Set fact indicating whether token creation is needed
+  ansible.builtin.set_fact:
+    __authentik_token_creation_needed: "{{ __authentik_vault_token_check.failed or __authentik_vault_token_check.data.data is not defined or __authentik_vault_token_check.data.data == '' }}"
+
+- name: Skip token creation — token already stored in Vault
+  when: not __authentik_token_creation_needed
+  ansible.builtin.debug:
+    msg: "Authentik API token already exists in Vault at {{ authentik_vault_kv_engine_name }}/{{ authentik_vault_kv_path }}, skipping creation."
+
+- name: Create and store Authentik API token
+  when: __authentik_token_creation_needed
+  block:
+    - name: Store Authentik API token in Vault KV
+      community.hashi_vault.vault_kv2_write:
+        url: "{{ __authentik_vault_url }}"
+        auth_method: "approle"
+        role_id: "{{ authentik_vault_role_id }}"
+        secret_id: "{{ authentik_vault_secret_id }}"
+        validate_certs: "{{ authentik_vault_validate_certs }}"
+        engine_mount_point: "{{ authentik_vault_kv_engine_name }}"
+        path: "{{ authentik_vault_kv_path }}"
+        data:
+          api_token: "{{ authentik_api_token }}"
+      delegate_to: localhost
+      no_log: true
+
+    - name: Display token storage confirmation
+      ansible.builtin.debug:
+        msg: "Authentik API token successfully stored in Vault at {{ authentik_vault_kv_engine_name }}/{{ authentik_vault_kv_path }}"

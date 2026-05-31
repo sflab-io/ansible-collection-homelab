@@ -1,0 +1,15 @@
+---
+# argument spec file for sflab.homelab.authentik
+
+argument_specs:
+  main:
+    short_description: Installl and configure Authentik
+    # options:
+    # authentik_init_url:
+    #   type: str
+    #   description: URL of the Authentik instance to initialize
+    #   required: true
+    # authentik_init_token:
+    #   type: str
+    #   description: API token for authenticating with the Authentik instance to initialize
+    #   required: true

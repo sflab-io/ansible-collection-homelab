@@ -1,5 +1,2 @@
 ---
 # defaults file for sflab.homelab.authentik_init
-
-authentik_init_url: ""
-authentik_init_token: ""

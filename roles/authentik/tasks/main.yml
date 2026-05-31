@@ -1,0 +1,75 @@
+---
+- name: Include task from role ax-bzh.authentik
+  ansible.builtin.include_role:
+    name: ax-bzh.authentik
+  vars:
+    authentik_server_image: "ghcr.io/goauthentik/server:2026.2.3"
+    authentik_subdomain: "auth"
+    authentik_base_domain: "{{ ansible_host }}"
+    hosting_domain: "{{ domain }}"
+    #
+    authentik_postgres_user: "authentik"
+    #
+    authentik_email_enabled: false
+    #
+    authentik_bootstrap_enabled: true
+    #
+    authentik_https_port: 443
+    #
+    authentik_server_labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.authentik.rule=Host(`{{ authentik_subdomain }}.{{ ansible_host }}`)"
+      - "traefik.http.routers.authentik.entrypoints=websecure"
+      - "traefik.http.routers.authentik.tls=true"
+      - "traefik.http.routers.authentik.tls.certresolver=vault"
+      - "traefik.http.services.authentik.loadbalancer.server.port=9000"
+    #
+    authentik_config_override:
+      identities:
+        roles:
+          list:
+            - name: authentik Read-only
+              state: present
+        groups:
+          list:
+            - name: authentik Admins
+              state: present
+            - name: authentik Read-only
+              state: present
+        users:
+          remove_bootstrap: false
+          list:
+            - username: akadmin
+              state: present
+              attributes:
+                settings:
+                  locale: "en"
+        tokens:
+          remove_others: false
+          list: []
+      prompts:
+        list: []
+      policies:
+        list: []
+      flows:
+        list: []
+      stages:
+        list: []
+      flow_bindings: []
+      invitations:
+        list: []
+      brands:
+        remove_others: false
+        list:
+          - domain: "{{ authentik_subdomain }}.{{ ansible_host }}"
+            state: present
+            name: "SFLab Homelab"
+            default: false
+            logo: "branding/logo.svg"
+            favicon: "branding/logo.ico"
+            background: ""
+            custom_css: ""
+
+- name: Store Authentik API token in Vault KV
+  when: authentik_store_api_token | bool
+  ansible.builtin.include_tasks: store_api_token.yml
