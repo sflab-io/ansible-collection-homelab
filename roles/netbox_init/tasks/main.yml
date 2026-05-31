@@ -34,13 +34,6 @@
     __netbox_api_token: "{{ __netbox_init_secret.secret.api_token }}"
   no_log: true
 
-# - name: Display test secret
-#   ansible.builtin.debug:
-#     msg: |
-#       api_token: {{ __netbox_api_token }}
-
-# --- Initialize NetBox sites, regions and tenant informations ---
-
 - name: "Create NetBox regions"
   netbox.netbox.netbox_region:
     netbox_token: "{{ __netbox_api_token }}"
@@ -185,6 +178,25 @@
   loop_control:
     loop_var: __netbox_device_interface_pair
     label: "{{ __netbox_device_interface_pair.0.name }}/{{ __netbox_device_interface_pair.1.name }}"
+
+- name: "Create NetBox tags"
+  netbox.netbox.netbox_tag:
+    netbox_token: "{{ __netbox_api_token }}"
+    data:
+      name: "{{ item }}"
+    state: present
+  loop: "{{ netbox_init_devices | map(attribute='tags', default=[]) | flatten | unique | list }}"
+
+- name: "Update NetBox device tags"
+  netbox.netbox.netbox_device:
+    netbox_token: "{{ __netbox_api_token }}"
+    data:
+      name: "{{ item.name }}"
+      tags: "{{ item.tags }}"
+    state: present
+  loop: "{{ netbox_init_devices | selectattr('tags', 'defined') | list }}"
+  loop_control:
+    label: "{{ item.name }}"
 
 # --- Initialize IPAM (VLANs and prefixes) ---
 
