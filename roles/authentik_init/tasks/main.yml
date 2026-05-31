@@ -14,7 +14,6 @@
     scopes: "{{ authentik_portainer_scopes }}"
     signing_key: "{{ authentik_portainer_signing_key }}"
     state: present
-    validate_certs: "{{ authentik_validate_certs }}"
   delegate_to: localhost
   register: authentik_portainer_provider
 
@@ -24,5 +23,4 @@
     slug: "{{ authentik_portainer_application_slug }}"
     provider: "{{ authentik_portainer_provider_name }}"
     state: present
-    validate_certs: "{{ authentik_validate_certs }}"
   delegate_to: localhost

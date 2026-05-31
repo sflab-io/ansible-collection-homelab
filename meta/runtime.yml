@@ -2,8 +2,10 @@
 requires_ansible: ">=2.15.0"
 
 action_groups:
-  authentik_users:
+  authentik:
     - authentik_users
+    - authentik_provider
+    - authentik_application
   vault:
     - vault_init
     - vault_unseal
