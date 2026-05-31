@@ -43,6 +43,7 @@
         path: "{{ authentik_vault_kv_path }}"
         data:
           api_token: "{{ authentik_api_token }}"
+          bootstrap_token: "{{ authentik_bootstrap_token }}"
       delegate_to: localhost
       no_log: true
 
