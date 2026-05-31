@@ -24,3 +24,24 @@
     provider: "{{ authentik_portainer_provider_name }}"
     state: present
   delegate_to: localhost
+
+- name: Create OAuth2 provider for Proxmox
+  sflab.homelab.authentik_provider:
+    name: "{{ authentik_proxmox_provider_name }}"
+    authorization_flow: "{{ authentik_proxmox_authorization_flow }}"
+    invalidation_flow: "{{ authentik_proxmox_invalidation_flow }}"
+    redirect_uris:
+      - "{{ authentik_proxmox_redirect_uri }}"
+    scopes: "{{ authentik_proxmox_scopes }}"
+    signing_key: "{{ authentik_proxmox_signing_key }}"
+    state: present
+  delegate_to: localhost
+  register: authentik_proxmox_provider
+
+- name: Create application for Proxmox
+  sflab.homelab.authentik_application:
+    name: "{{ authentik_proxmox_application_name }}"
+    slug: "{{ authentik_proxmox_application_slug }}"
+    provider: "{{ authentik_proxmox_provider_name }}"
+    state: present
+  delegate_to: localhost

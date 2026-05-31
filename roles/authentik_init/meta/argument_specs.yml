@@ -3,13 +3,41 @@
 
 argument_specs:
   main:
-    short_description: Initialize Authentik with data from NetBox
-    # options:
-    #   authentik_init_url:
-    #     type: str
-    #     description: URL of the Authentik instance to initialize
-    #     required: true
-    #   authentik_init_token:
-    #     type: str
-    #     description: API token for authenticating with the Authentik instance to initialize
-    #     required: true
+    short_description: Initialize Authentik with data from NetBox and create OAuth2 providers
+    options:
+      authentik_proxmox_provider_name:
+        type: str
+        default: proxmox
+        description: Name of the Proxmox OAuth2 provider in Authentik
+      authentik_proxmox_redirect_uri:
+        type: str
+        default: "https://proxmox.home.sflab.io:8006"
+        description: OAuth2 redirect URI for the Proxmox VE instance
+      authentik_proxmox_authorization_flow:
+        type: str
+        default: default-provider-authorization-explicit-consent
+        description: Authentik authorization flow slug for the Proxmox provider
+      authentik_proxmox_invalidation_flow:
+        type: str
+        default: default-provider-invalidation-flow
+        description: Authentik invalidation flow slug for the Proxmox provider
+      authentik_proxmox_signing_key:
+        type: str
+        default: "authentik Self-signed Certificate"
+        description: Name of the certificate key pair used for signing tokens
+      authentik_proxmox_scopes:
+        type: list
+        elements: str
+        default:
+          - openid
+          - profile
+          - email
+        description: OAuth2 scopes for the Proxmox provider
+      authentik_proxmox_application_name:
+        type: str
+        default: Proxmox
+        description: Display name of the Proxmox application in Authentik
+      authentik_proxmox_application_slug:
+        type: str
+        default: proxmox
+        description: URL slug of the Proxmox application in Authentik

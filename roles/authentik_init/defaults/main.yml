@@ -14,3 +14,15 @@ authentik_portainer_scopes:
   - email
 authentik_portainer_application_name: "Portainer"
 authentik_portainer_application_slug: "portainer"
+
+authentik_proxmox_provider_name: "proxmox"
+authentik_proxmox_redirect_uri: "https://proxmox.home.sflab.io:8006"
+authentik_proxmox_authorization_flow: "default-provider-authorization-explicit-consent"
+authentik_proxmox_invalidation_flow: "default-provider-invalidation-flow"
+authentik_proxmox_signing_key: "authentik Self-signed Certificate"
+authentik_proxmox_scopes:
+  - openid
+  - profile
+  - email
+authentik_proxmox_application_name: "Proxmox"
+authentik_proxmox_application_slug: "proxmox"
