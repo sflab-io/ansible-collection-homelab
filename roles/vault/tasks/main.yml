@@ -17,9 +17,5 @@
 - name: Configure service
   ansible.builtin.import_tasks: service.yml
 
-# # For testing purposes omly, we uninitialize and reinitialize vault
-# - name: Uninitialize vault
-#   ansible.builtin.import_tasks: uninit.yml
-
 - name: Init vault
   ansible.builtin.import_tasks: init.yml

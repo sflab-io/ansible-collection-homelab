@@ -51,8 +51,16 @@
     secret_shares: 5
     secret_threshold: 3
     validate_certs: "{{ vault_api_validate_certs }}"
-  register: vault_init_result
+  register: __vault_init_new_result
   when: not __vault_init_status.json.initialized
+
+- name: Set vault_init_result after fresh initialization
+  ansible.builtin.set_fact:
+    vault_init_result: "{{ __vault_init_new_result }}"
+  when:
+    - not __vault_init_status.json.initialized
+    - __vault_init_new_result is defined
+    - __vault_init_new_result.root_token is defined
 
 - name: Save vault init data to file
   ansible.builtin.copy:

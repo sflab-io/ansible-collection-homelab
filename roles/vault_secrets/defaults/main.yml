@@ -10,3 +10,4 @@ vault_secrets_api_protocol: "https"
 vault_secrets_api_host: "{{ ansible_facts['default_ipv4']['address'] }}"
 vault_secrets_api_port: 8200
 vault_secrets_validate_certs: false
+vault_secrets_data: []

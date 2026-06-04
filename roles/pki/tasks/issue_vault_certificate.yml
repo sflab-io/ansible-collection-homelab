@@ -45,12 +45,12 @@
   register: __pki_vault_cert_info
 
 - name: Debug print __pki_vault_cert_info
-  when: __pki_vault_cert_info is defined
+  when: __pki_vault_cert_stat.stat.exists
   ansible.builtin.debug:
     var: __pki_vault_cert_info
 
 - name: Get issuer from __pki_vault_cert_info
-  when: __pki_vault_cert_info is defined
+  when: __pki_vault_cert_stat.stat.exists
   ansible.builtin.set_fact:
     __pki_vault_cert_issuer: "{{ __pki_vault_cert_info.issuer.commonName }}"
 
@@ -64,7 +64,7 @@
 - name: Determine if certificate renewal is needed
   ansible.builtin.set_fact:
     __pki_vault_cert_needs_renewal: >-
-      {{ __pki_vault_cert_issuer != pki_intermediate_common_name
+      {{ __pki_vault_cert_issuer | default('') != pki_intermediate_common_name
       or not __pki_vault_cert_stat.stat.exists
       or (__pki_vault_cert_days_remaining | default(0) | int) < (pki_vault_certificate_renewal_days | int) }}
 
