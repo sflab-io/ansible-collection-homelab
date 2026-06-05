@@ -10,12 +10,8 @@ docker_vault_acme_endpoint: "https://vault.{{ domain }}:8200/v1/pki_intermediate
 # ACME email address
 docker_acme_email: "acme@{{ domain }}"
 
-# Deploy Traefik reverse proxy
-docker_deploy_traefik: true
-
 # Docker network for Traefik
 docker_traefik_proxy_network: "proxy"
 
-# Deploy Portainer container management UI
-# Accessible via: https://portainer.{{ docker_domain }}
-docker_deploy_portainer: true
+# Deploy Traefik reverse proxy
+docker_deploy_stacks: []
