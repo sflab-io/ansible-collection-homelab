@@ -16,7 +16,6 @@
 
 - name: Output appRole credentials
   ansible.builtin.include_tasks: output_approle_credentials.yml
-  when: ansible_verbosity > 0
 
 - name: Initialize secrets data
   ansible.builtin.include_tasks: initialize_secrets_data.yml

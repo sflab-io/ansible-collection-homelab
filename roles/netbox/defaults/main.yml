@@ -7,10 +7,6 @@
 # Changing this value invalidates all existing API tokens.
 netbox_api_token_pepper: ""
 
-# --- API Token creation ---
-# Set to true to automatically create a NetBox API token via REST API and store it in Vault KV.
-netbox_create_api_token: false
-
 # NetBox admin username for which the API token is created.
 netbox_api_token_admin_username: "admin"
 
@@ -29,18 +25,8 @@ netbox_api_url: "http://127.0.0.1"
 # Whether to validate the NetBox TLS certificate during token provisioning.
 netbox_api_validate_certs: false
 
-# --- Vault connection (required when netbox_create_api_token: true) ---
-netbox_vault_api_protocol: "https"
-netbox_vault_api_host: "vault.home.sflab.io"
-netbox_vault_api_port: 8200
-netbox_vault_validate_certs: false
-
-# Vault AppRole credentials (required when netbox_create_api_token: true).
-netbox_vault_role_id: ""
-netbox_vault_secret_id: ""
-
 # KV v2 engine mount point (must already exist in Vault).
-netbox_vault_kv_engine_name: "secrets_homelab"
+vault_kv_engine_name: "secrets_homelab"
 
 # Path inside the KV engine where the token is stored.
-netbox_vault_kv_path: "netbox_{{ env }}"
+vault_kv_path: "netbox"

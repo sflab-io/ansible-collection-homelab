@@ -16,5 +16,4 @@
   ansible.builtin.include_tasks: migrate.yml
 
 - name: Create NetBox API token and store in Vault
-  when: netbox_create_api_token | bool
   ansible.builtin.include_tasks: create_api_token.yml

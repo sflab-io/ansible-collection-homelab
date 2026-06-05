@@ -18,19 +18,15 @@
 # - Vault must be reachable and configured with the KV engine and AppRole credentials
 #
 
-- name: Set Vault URL fact
-  ansible.builtin.set_fact:
-    __netbox_vault_url: "{{ netbox_vault_api_protocol }}://{{ netbox_vault_api_host }}:{{ netbox_vault_api_port }}"
-
 - name: Check if NetBox API token already exists in Vault KV
   community.hashi_vault.vault_kv2_get:
-    url: "{{ __netbox_vault_url }}"
+    url: "{{ vault_url }}"
     auth_method: "approle"
-    role_id: "{{ netbox_vault_role_id }}"
-    secret_id: "{{ netbox_vault_secret_id }}"
-    validate_certs: "{{ netbox_vault_validate_certs }}"
-    engine_mount_point: "{{ netbox_vault_kv_engine_name }}"
-    path: "{{ netbox_vault_kv_path }}"
+    role_id: "{{ vault_role_id }}"
+    secret_id: "{{ vault_secret_id }}"
+    validate_certs: "{{ vault_validate_certs }}"
+    engine_mount_point: "{{ vault_kv_engine_name }}"
+    path: "{{ vault_kv_path }}"
   register: __netbox_vault_token_check
   ignore_errors: true
   delegate_to: localhost
@@ -43,7 +39,7 @@
 - name: Skip token creation — token already stored in Vault
   when: not __netbox_token_creation_needed
   ansible.builtin.debug:
-    msg: "NetBox API token already exists in Vault at {{ netbox_vault_kv_engine_name }}/{{ netbox_vault_kv_path }}, skipping creation."
+    msg: "NetBox API token already exists in Vault at {{ vault_kv_engine_name }}/{{ vault_kv_path }}, skipping creation."
 
 - name: Create and store NetBox API token
   when: __netbox_token_creation_needed
@@ -64,18 +60,18 @@
 
     - name: Store NetBox API token in Vault KV
       community.hashi_vault.vault_kv2_write:
-        url: "{{ __netbox_vault_url }}"
+        url: "{{ vault_url }}"
         auth_method: "approle"
-        role_id: "{{ netbox_vault_role_id }}"
-        secret_id: "{{ netbox_vault_secret_id }}"
-        validate_certs: "{{ netbox_vault_validate_certs }}"
-        engine_mount_point: "{{ netbox_vault_kv_engine_name }}"
-        path: "{{ netbox_vault_kv_path }}"
+        role_id: "{{ vault_role_id }}"
+        secret_id: "{{ vault_secret_id }}"
+        validate_certs: "{{ vault_validate_certs }}"
+        engine_mount_point: "{{ vault_kv_engine_name }}"
+        path: "{{ vault_kv_path }}"
         data:
           api_token: "nbt_{{ __netbox_api_token_result.json.key }}.{{ __netbox_api_token_result.json.token }}"
       delegate_to: localhost
-      no_log: true
+      # no_log: true
 
     - name: Display token storage confirmation
       ansible.builtin.debug:
-        msg: "NetBox API token successfully stored in Vault at {{ netbox_vault_kv_engine_name }}/{{ netbox_vault_kv_path }}"
+        msg: "NetBox API token successfully stored in Vault at {{ vault_kv_engine_name }}/{{ vault_kv_path }}"

@@ -26,5 +26,5 @@
   when: inventory_hostname in groups['dns_primary_servers']
 
 - name: Store tsig key in Vault
-  when: technitium_store_tsig_key | bool and inventory_hostname in groups['dns_primary_servers']
+  when: inventory_hostname in groups['dns_primary_servers']
   ansible.builtin.include_tasks: store_tsig_key.yml

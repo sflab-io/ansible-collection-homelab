@@ -2,19 +2,15 @@
 #
 # This task file stores the TSIG key for Technitium DNS Server in Vault KV.
 
-- name: Set Vault URL fact
-  ansible.builtin.set_fact:
-    __technitium_vault_url: "{{ technitium_vault_api_protocol }}://{{ technitium_vault_api_host }}:{{ technitium_vault_api_port }}"
-
 - name: Check if Technitium TSIG key already exists in Vault KV
   community.hashi_vault.vault_kv2_get:
-    url: "{{ __technitium_vault_url }}"
+    url: "{{ vault_url }}"
     auth_method: "approle"
-    role_id: "{{ technitium_vault_role_id }}"
-    secret_id: "{{ technitium_vault_secret_id }}"
-    validate_certs: "{{ technitium_vault_validate_certs }}"
-    engine_mount_point: "{{ technitium_vault_kv_engine_name }}"
-    path: "{{ technitium_vault_kv_path }}"
+    role_id: "{{ vault_role_id }}"
+    secret_id: "{{ vault_secret_id }}"
+    validate_certs: "{{ vault_validate_certs }}"
+    engine_mount_point: "{{ vault_kv_engine_name }}"
+    path: "{{ vault_kv_path }}"
   register: __technitium_vault_token_check
   ignore_errors: true
   delegate_to: localhost
@@ -27,20 +23,20 @@
 - name: Skip token creation — token already stored in Vault
   when: not __technitium_token_creation_needed
   ansible.builtin.debug:
-    msg: "Technitium TSIG key already exists in Vault at {{ technitium_vault_kv_engine_name }}/{{ technitium_vault_kv_path }}, skipping creation."
+    msg: "Technitium TSIG key already exists in Vault at {{ vault_kv_engine_name }}/{{ vault_kv_path }}, skipping creation."
 
 - name: Create and store Technitium TSIG key
   when: __technitium_token_creation_needed
   block:
     - name: Store Technitium TSIG key in Vault KV
       community.hashi_vault.vault_kv2_write:
-        url: "{{ __technitium_vault_url }}"
+        url: "{{ vault_url }}"
         auth_method: "approle"
-        role_id: "{{ technitium_vault_role_id }}"
-        secret_id: "{{ technitium_vault_secret_id }}"
-        validate_certs: "{{ technitium_vault_validate_certs }}"
-        engine_mount_point: "{{ technitium_vault_kv_engine_name }}"
-        path: "{{ technitium_vault_kv_path }}"
+        role_id: "{{ vault_role_id }}"
+        secret_id: "{{ vault_secret_id }}"
+        validate_certs: "{{ vault_validate_certs }}"
+        engine_mount_point: "{{ vault_kv_engine_name }}"
+        path: "{{ vault_kv_path }}"
         data:
           tsig_key_name: "{{ technitium_tsig_key_name }}"
           tsig_key_secret: "{{ technitium_tsig_key_secret }}"
@@ -49,4 +45,4 @@
 
     - name: Display token storage confirmation
       ansible.builtin.debug:
-        msg: "Technitium TSIG key successfully stored in Vault at {{ technitium_vault_kv_engine_name }}/{{ technitium_vault_kv_path }}"
+        msg: "Technitium TSIG key successfully stored in Vault at {{ vault_kv_engine_name }}/{{ vault_kv_path }}"

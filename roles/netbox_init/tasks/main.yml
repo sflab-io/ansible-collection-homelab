@@ -12,19 +12,15 @@
 
 # ---
 
-- name: Set Vault URL fact
-  ansible.builtin.set_fact:
-    __netbox_vault_url: "{{ netbox_vault_api_protocol }}://{{ netbox_vault_api_host }}:{{ netbox_vault_api_port }}"
-
 - name: Read secret via AppRole authentication
   community.hashi_vault.vault_kv2_get:
-    url: "{{ __netbox_vault_url }}"
+    url: "{{ vault_url }}"
     auth_method: "approle"
-    role_id: "{{ netbox_vault_role_id }}"
-    secret_id: "{{ netbox_vault_secret_id }}"
-    validate_certs: "{{ netbox_vault_validate_certs }}"
-    engine_mount_point: "{{ netbox_vault_kv_engine_name }}"
-    path: "{{ netbox_vault_kv_path }}"
+    role_id: "{{ vault_role_id }}"
+    secret_id: "{{ vault_secret_id }}"
+    validate_certs: "{{ vault_validate_certs }}"
+    engine_mount_point: "{{ vault_kv_engine_name }}"
+    path: "{{ vault_kv_path }}"
   register: __netbox_init_secret
   no_log: true
   delegate_to: localhost

@@ -4,18 +4,8 @@
 # Set to true to automatically store Technitium TSIG key in Vault KV. Requires Vault connection details and AppRole credentials to be set.
 technitium_store_tsig_key: false
 
-# --- Vault connection
-technitium_vault_api_protocol: "https"
-technitium_vault_api_host: "vault.home.sflab.io"
-technitium_vault_api_port: 8200
-technitium_vault_validate_certs: false
-
-# Vault AppRole credentials
-technitium_vault_role_id: ""
-technitium_vault_secret_id: ""
-
 # KV v2 engine mount point (must already exist in Vault).
-technitium_vault_kv_engine_name: "secrets_homelab"
+vault_kv_engine_name: "secrets_homelab"
 
 # Path inside the KV engine where the token is stored.
-technitium_vault_kv_path: "technitium"
+vault_kv_path: "technitium"
