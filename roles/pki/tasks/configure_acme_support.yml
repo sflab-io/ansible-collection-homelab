@@ -37,3 +37,14 @@
     path: "{{ pki_intermediate_mount_point }}/config/acme"
     data:
       enabled: true
+
+- name: Configure PKI cluster URL for ACME directory
+  sflab.homelab.vault_write:
+    url: "{{ __pki_vault_url }}"
+    auth_method: "token"
+    token: "{{ __pki_vault_init_data.root_token }}"
+    validate_certs: "{{ pki_vault_api_validate_certs }}"
+    path: "{{ pki_intermediate_mount_point }}/config/cluster"
+    data:
+      path: "{{ pki_vault_cluster_path }}"
+      aia_path: "{{ pki_vault_cluster_path }}"

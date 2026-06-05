@@ -23,6 +23,16 @@ argument_specs:
           - Set to "https" after TLS certificate is issued and Vault is configured for TLS.
           - Must match the vault role's listener configuration.
 
+      pki_vault_cluster_path:
+        type: str
+        required: false
+        default: "https://{{ pki_vault_api_host }}:{{ pki_vault_api_port }}/v1/{{ pki_intermediate_mount_point }}"
+        description:
+          - Public HTTPS URL written to the PKI /config/cluster endpoint.
+          - Used by ACME clients (e.g. Traefik) to construct ACME directory URLs.
+          - Must always use https regardless of pki_vault_api_protocol.
+          - Overriding is only needed when the public URL differs from the API host.
+
       pki_vault_api_port:
         type: int
         required: false
