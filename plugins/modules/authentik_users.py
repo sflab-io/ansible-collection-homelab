@@ -55,7 +55,7 @@ options:
       - The desired state of the synchronization.
       - When C(present), creates groups and users in Authentik as needed.
       - When C(absent), removes users and groups from Authentik that originate from NetBox data.
-  validate_certs:
+  authentik_validate_certs:
     type: bool
     required: false
     default: true
@@ -72,7 +72,7 @@ options:
       - Path to a PEM-encoded CA certificate file used to verify the Authentik server certificate.
       - Use this when the Authentik server uses a certificate issued by a custom or internal CA
         (for example a HashiCorp Vault PKI CA).
-      - When set, O(validate_certs) should remain C(true).
+      - When set, O(authentik_validate_certs) should remain C(true).
 """
 
 EXAMPLES = r"""
@@ -159,7 +159,7 @@ ARGSPEC: dict = dict(
     authentik_url=dict(type="str", required=True),
     authentik_token=dict(type="str", required=True, no_log=True),
     state=dict(type="str", required=False, default="present", choices=["present", "absent"]),
-    validate_certs=dict(type="bool", required=False, default=True),
+    authentik_validate_certs=dict(type="bool", required=False, default=True),
     ca_cert_path=dict(type="path", required=False, default=None),
 )
 
@@ -543,7 +543,7 @@ def run_module() -> None:
     authentik_url: str = module.params["authentik_url"].rstrip("/")
     authentik_token: str = module.params["authentik_token"]
     state: str = module.params["state"]
-    validate_certs: bool = module.params["validate_certs"]
+    authentik_validate_certs: bool = module.params["authentik_validate_certs"]
     ca_cert_path: Optional[str] = module.params["ca_cert_path"]
 
     # Ensure the URL points to the API root; append /api/v3 when not already present.
@@ -553,7 +553,7 @@ def run_module() -> None:
     configuration = authentik_client.Configuration(
         host=authentik_url,
         access_token=authentik_token,
-        verify_ssl=validate_certs,
+        verify_ssl=authentik_validate_certs,
         ssl_ca_cert=ca_cert_path,
     )
 

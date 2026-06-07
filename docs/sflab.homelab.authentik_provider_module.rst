@@ -72,6 +72,27 @@ Parameters
             <tr>
                 <td colspan="1">
                     <div class="ansibleOptionAnchor" id="parameter-"></div>
+                    <b>authentik_validate_certs</b>
+                    <a class="ansibleOptionLink" href="#parameter-" title="Permalink to this option"></a>
+                    <div style="font-size: small">
+                        <span style="color: purple">boolean</span>
+                    </div>
+                </td>
+                <td>
+                        <ul style="margin: 0; padding: 0"><b>Choices:</b>
+                                    <li>no</li>
+                                    <li><div style="color: blue"><b>yes</b>&nbsp;&larr;</div></li>
+                        </ul>
+                </td>
+                <td>
+                        <div>Whether to validate SSL certificates when connecting to the Authentik API.</div>
+                        <div>Set to <code>false</code> when using a self-signed or custom CA certificate that is not trusted by the system&#x27;s default CA store.</div>
+                        <div>Note: Disabling certificate validation is not recommended for production use unless combined with O(ca_cert_path).</div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="1">
+                    <div class="ansibleOptionAnchor" id="parameter-"></div>
                     <b>authorization_flow</b>
                     <a class="ansibleOptionLink" href="#parameter-" title="Permalink to this option"></a>
                     <div style="font-size: small">
@@ -100,7 +121,7 @@ Parameters
                 <td>
                         <div>Path to a PEM-encoded CA certificate file used to verify the Authentik server certificate.</div>
                         <div>Use this when the Authentik server uses a certificate issued by a custom or internal CA (for example a HashiCorp Vault PKI CA).</div>
-                        <div>When set, O(validate_certs) should remain <code>true</code>.</div>
+                        <div>When set, O(authentik_validate_certs) should remain <code>true</code>.</div>
                 </td>
             </tr>
             <tr>
@@ -229,27 +250,6 @@ Parameters
                         <div>The desired state of the provider.</div>
                         <div>When <code>present</code>, creates the provider if it does not exist.</div>
                         <div>When <code>absent</code>, removes the provider if it exists.</div>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="1">
-                    <div class="ansibleOptionAnchor" id="parameter-"></div>
-                    <b>validate_certs</b>
-                    <a class="ansibleOptionLink" href="#parameter-" title="Permalink to this option"></a>
-                    <div style="font-size: small">
-                        <span style="color: purple">boolean</span>
-                    </div>
-                </td>
-                <td>
-                        <ul style="margin: 0; padding: 0"><b>Choices:</b>
-                                    <li>no</li>
-                                    <li><div style="color: blue"><b>yes</b>&nbsp;&larr;</div></li>
-                        </ul>
-                </td>
-                <td>
-                        <div>Whether to validate SSL certificates when connecting to the Authentik API.</div>
-                        <div>Set to <code>false</code> when using a self-signed or custom CA certificate that is not trusted by the system&#x27;s default CA store.</div>
-                        <div>Note: Disabling certificate validation is not recommended for production use unless combined with O(ca_cert_path).</div>
                 </td>
             </tr>
     </table>

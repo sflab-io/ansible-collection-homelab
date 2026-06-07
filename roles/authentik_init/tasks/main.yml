@@ -4,44 +4,29 @@
     state: present
   delegate_to: localhost
 
-- name: Create OAuth2 provider for Portainer
+- name: Create provider
   sflab.homelab.authentik_provider:
-    name: "{{ authentik_portainer_provider_name }}"
-    authorization_flow: "{{ authentik_portainer_authorization_flow }}"
-    invalidation_flow: "{{ authentik_portainer_invalidation_flow }}"
+    name: "{{ provider.provider_name }}"
+    authorization_flow: "{{ provider.authorization_flow }}"
+    invalidation_flow: "{{ provider.invalidation_flow }}"
     redirect_uris:
-      - "{{ authentik_portainer_redirect_uri }}"
-    scopes: "{{ authentik_portainer_scopes }}"
-    signing_key: "{{ authentik_portainer_signing_key }}"
+      - "{{ provider.redirect_uri }}"
+    scopes: "{{ provider.scopes }}"
+    signing_key: "{{ provider.signing_key }}"
     state: present
   delegate_to: localhost
   register: authentik_portainer_provider
+  loop: "{{ providers }}"
+  loop_control:
+    loop_var: provider
 
-- name: Create application for Portainer
+- name: Create application
   sflab.homelab.authentik_application:
-    name: "{{ authentik_portainer_application_name }}"
-    slug: "{{ authentik_portainer_application_slug }}"
-    provider: "{{ authentik_portainer_provider_name }}"
+    name: "{{ application.application_name }}"
+    slug: "{{ application.application_slug }}"
+    provider: "{{ application.provider_name }}"
     state: present
   delegate_to: localhost
-
-- name: Create OAuth2 provider for Proxmox
-  sflab.homelab.authentik_provider:
-    name: "{{ authentik_proxmox_provider_name }}"
-    authorization_flow: "{{ authentik_proxmox_authorization_flow }}"
-    invalidation_flow: "{{ authentik_proxmox_invalidation_flow }}"
-    redirect_uris:
-      - "{{ authentik_proxmox_redirect_uri }}"
-    scopes: "{{ authentik_proxmox_scopes }}"
-    signing_key: "{{ authentik_proxmox_signing_key }}"
-    state: present
-  delegate_to: localhost
-  register: authentik_proxmox_provider
-
-- name: Create application for Proxmox
-  sflab.homelab.authentik_application:
-    name: "{{ authentik_proxmox_application_name }}"
-    slug: "{{ authentik_proxmox_application_slug }}"
-    provider: "{{ authentik_proxmox_provider_name }}"
-    state: present
-  delegate_to: localhost
+  loop: "{{ applications }}"
+  loop_control:
+    loop_var: application

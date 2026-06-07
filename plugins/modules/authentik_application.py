@@ -59,7 +59,7 @@ options:
       - The desired state of the application.
       - When C(present), creates the application if it does not exist.
       - When C(absent), removes the application if it exists.
-  validate_certs:
+  authentik_validate_certs:
     type: bool
     required: false
     default: true
@@ -76,7 +76,7 @@ options:
       - Path to a PEM-encoded CA certificate file used to verify the Authentik server certificate.
       - Use this when the Authentik server uses a certificate issued by a custom or internal CA
         (for example a HashiCorp Vault PKI CA).
-      - When set, O(validate_certs) should remain C(true).
+      - When set, O(authentik_validate_certs) should remain C(true).
 """
 
 EXAMPLES = r"""
@@ -137,7 +137,7 @@ ARGSPEC: dict = dict(
     slug=dict(type="str", required=True),
     provider=dict(type="str", required=False, default=None),
     state=dict(type="str", required=False, default="present", choices=["present", "absent"]),
-    validate_certs=dict(type="bool", required=False, default=True),
+    authentik_validate_certs=dict(type="bool", required=False, default=True),
     ca_cert_path=dict(type="path", required=False, default=None),
 )
 
@@ -300,7 +300,7 @@ def run_module() -> None:
     authentik_url: str = module.params["authentik_url"].rstrip("/")
     authentik_token: str = module.params["authentik_token"]
     state: str = module.params["state"]
-    validate_certs: bool = module.params["validate_certs"]
+    authentik_validate_certs: bool = module.params["authentik_validate_certs"]
     ca_cert_path: Optional[str] = module.params["ca_cert_path"]
 
     if not authentik_url.endswith("/api/v3"):
@@ -309,7 +309,7 @@ def run_module() -> None:
     configuration = authentik_client.Configuration(
         host=authentik_url,
         access_token=authentik_token,
-        verify_ssl=validate_certs,
+        verify_ssl=authentik_validate_certs,
         ssl_ca_cert=ca_cert_path,
     )
 
