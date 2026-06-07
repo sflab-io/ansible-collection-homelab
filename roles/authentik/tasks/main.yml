@@ -71,5 +71,4 @@
             custom_css: ""
 
 - name: Store Authentik API token in Vault KV
-  when: authentik_store_api_token | bool
   ansible.builtin.include_tasks: store_api_token.yml

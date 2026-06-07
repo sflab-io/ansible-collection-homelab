@@ -70,7 +70,7 @@
         data:
           api_token: "nbt_{{ __netbox_api_token_result.json.key }}.{{ __netbox_api_token_result.json.token }}"
       delegate_to: localhost
-      # no_log: true
+      no_log: true
 
     - name: Display token storage confirmation
       ansible.builtin.debug:
