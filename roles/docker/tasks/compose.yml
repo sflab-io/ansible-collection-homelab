@@ -29,6 +29,6 @@
   register: docker_output
 
 - name: Show results only if verbose mode is enabled
-  # when: ansible_verbosity > 0
+  when: ansible_verbosity > 0
   ansible.builtin.debug:
     var: docker_output

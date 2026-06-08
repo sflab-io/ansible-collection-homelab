@@ -15,3 +15,9 @@ docker_traefik_proxy_network: "proxy"
 
 # Deploy Traefik reverse proxy
 docker_deploy_stacks: []
+
+# Remote docker-compose repository URL (HTTPS)
+compose_remote_url: ""
+
+# Remote stacks to deploy (list of {name, envs} dicts)
+compose_remote_stacks: []
