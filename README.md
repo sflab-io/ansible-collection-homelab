@@ -75,7 +75,7 @@ Name | Description
 | `sflab.homelab.firewall` | OPNsense firewall configuration via JSON criteria files |
 | `sflab.homelab.netbox` | NetBox IPAM/DCIM deployment and configuration |
 | `sflab.homelab.netbox_init` | NetBox initial data population |
-| `sflab.homelab.pki` | PKI infrastructure via HashiCorp Vault (root CA, intermediate CA) |
+| `sflab.homelab.vault_pki` | PKI infrastructure via HashiCorp Vault (root CA, intermediate CA) |
 | `sflab.homelab.self_signed_certificate` | Self-signed TLS certificate generation |
 | `sflab.homelab.technitium` | Technitium DNS server (primary/secondary) |
 | `sflab.homelab.vault` | HashiCorp Vault installation and initialization |

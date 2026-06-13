@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is `sflab.homelab`, an Ansible Collection for managing homelab infrastructure. The collection includes:
 
-- **Roles**: `common`, `docker`, `firewall`, `netbox`, `netbox_init`, `pki`, `self_signed_certificate`, `technitium` (DNS), `vault` (HashiCorp Vault), and `vault_secrets`
+- **Roles**: `common`, `docker`, `firewall`, `netbox`, `netbox_init`, `vault_pki`, `self_signed_certificate`, `technitium` (DNS), `vault` (HashiCorp Vault), and `vault_secrets`
 - **Plugins**: Action plugins, doc fragments, filters, lookups, modules (Vault PKI), and module utilities
 - **Testing**: Unit tests (pytest) and integration tests (molecule)
 - **Repository**: [sflab-io/ansible-collection-homelab](https://github.com/sflab-io/ansible-collection-homelab)
@@ -171,7 +171,7 @@ sflab.homelab/
 │   ├── firewall/             # OPNsense firewall configuration
 │   ├── netbox/               # NetBox IPAM/DCIM
 │   ├── netbox_init/          # NetBox initialization
-│   ├── pki/                  # PKI via HashiCorp Vault
+│   ├── vault_pki/             # PKI via HashiCorp Vault
 │   ├── self_signed_certificate/ # Self-signed TLS certificates
 │   ├── technitium/           # Technitium DNS server (primary/secondary)
 │   ├── vault/                # HashiCorp Vault installation
@@ -264,7 +264,7 @@ Manages OPNsense firewall configuration via JSON criteria files.
   `tasks/gateways.yml`, `tasks/nat.yml`, `tasks/rules.yml`, `tasks/shaper.yml`,
   `tasks/tls.yml`, `tasks/vlans.yml`
 
-#### PKI Role Pattern
+#### vault_pki Role Pattern
 
 **Type**: Implementation role using HashiCorp Vault PKI secret engine
 
@@ -272,7 +272,7 @@ Configures Vault PKI for root CA, intermediate CA, and certificate issuance.
 
 **Task files**: `tasks/configure_secret_engine_root_ca.yml`, `tasks/configure_secret_engine_intermediate_ca.yml`,
 `tasks/generate_root_ca_certificate.yml`, `tasks/generate_intermediate_ca_certificate.yml`,
-`tasks/sign_intermediate_csr.yml`, `tasks/create_pki_roles.yml`, `tasks/issue_vault_certificate.yml`,
+`tasks/sign_intermediate_csr.yml`, `tasks/create_vault_pki_roles.yml`, `tasks/issue_vault_certificate.yml`,
 `tasks/configure_acme_support.yml`, `tasks/load_vault_init_data.yml`
 
 ### Plugin Development

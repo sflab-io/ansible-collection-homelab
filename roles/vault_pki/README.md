@@ -1,4 +1,4 @@
-# sflab.homelab pki Role
+# sflab.homelab vault_pki Role
 
 A brief description of the role goes here.
 
@@ -22,22 +22,22 @@ Including an example of how to use your role (for instance, with variables passe
 - name: Execute tasks on servers
   hosts: servers
   roles:
-    - role: sflab.homelab.pki
-      pki_x: 42
+    - role: sflab.homelab.vault_pki
+      vault_pki_x: 42
 ```
 
 Another way to consume this role would be:
 
 ```yaml
-- name: Initialize the pki role from sflab.homelab
+- name: Initialize the vault_pki role from sflab.homelab
   hosts: servers
   gather_facts: false
   tasks:
-    - name: Trigger invocation of pki role
+    - name: Trigger invocation of vault_pki role
       ansible.builtin.include_role:
-        name: sflab.homelab.pki
+        name: sflab.homelab.vault_pki
       vars:
-        pki_x: 42
+        vault_pki_x: 42
 ```
 
 ## Role Idempotency

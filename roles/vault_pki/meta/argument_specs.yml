@@ -1,11 +1,11 @@
 ---
-# argument spec file for sflab.homelab.pki
+# argument spec file for sflab.homelab.vault_pki
 
 argument_specs:
   main:
     short_description: Configure HashiCorp Vault PKI secret engine for certificate management
     options:
-      pki_vault_domain:
+      vault_pki_vault_domain:
         type: str
         required: false
         default: "{{ domain }}"
@@ -14,7 +14,7 @@ argument_specs:
           - Used in the Common Name and Subject Alternative Names of issued certificates.
           - Should be a domain you control, even if it's only used internally.
 
-      pki_vault_api_protocol:
+      vault_pki_vault_api_protocol:
         type: str
         required: false
         default: "http"
@@ -23,17 +23,17 @@ argument_specs:
           - Set to "https" after TLS certificate is issued and Vault is configured for TLS.
           - Must match the vault role's listener configuration.
 
-      pki_vault_cluster_path:
+      vault_pki_vault_cluster_path:
         type: str
         required: false
-        default: "https://{{ pki_vault_api_host }}:{{ pki_vault_api_port }}/v1/{{ pki_intermediate_mount_point }}"
+        default: "https://{{ vault_pki_vault_api_host }}:{{ vault_pki_vault_api_port }}/v1/{{ vault_pki_intermediate_mount_point }}"
         description:
           - Public HTTPS URL written to the PKI /config/cluster endpoint.
           - Used by ACME clients (e.g. Traefik) to construct ACME directory URLs.
-          - Must always use https regardless of pki_vault_api_protocol.
+          - Must always use https regardless of vault_pki_vault_api_protocol.
           - Overriding is only needed when the public URL differs from the API host.
 
-      pki_vault_api_port:
+      vault_pki_vault_api_port:
         type: int
         required: false
         default: 8200
@@ -41,7 +41,7 @@ argument_specs:
           - The port on which the Vault API listens.
           - Must match the vault role's configured API port.
 
-      pki_root_mount_point:
+      vault_pki_root_mount_point:
         type: str
         required: false
         default: "pki_root"
@@ -49,14 +49,14 @@ argument_specs:
           - Mount point for the root CA PKI secret engine.
           - This will be the path used to access the PKI engine in Vault.
 
-      pki_root_description:
+      vault_pki_root_description:
         type: str
         required: false
         default: "Root CA PKI secret engine"
         description:
           - Human-readable description of the PKI secret engine.
 
-      pki_root_default_lease_ttl:
+      vault_pki_root_default_lease_ttl:
         type: str
         required: false
         default: "43800h"
@@ -65,7 +65,7 @@ argument_specs:
           - Can be a duration string (e.g., "43800h", "5y") or seconds.
           - Default is 5 years (43800 hours).
 
-      pki_root_max_lease_ttl:
+      vault_pki_root_max_lease_ttl:
         type: str
         required: false
         default: "87600h"
@@ -73,9 +73,9 @@ argument_specs:
           - Maximum TTL for certificates issued by this engine.
           - Can be a duration string (e.g., "87600h", "10y") or seconds.
           - Default is 10 years (87600 hours).
-          - Must be greater than or equal to pki_root_default_lease_ttl.
+          - Must be greater than or equal to vault_pki_root_default_lease_ttl.
 
-      pki_root_replace_different_backend:
+      vault_pki_root_replace_different_backend:
         type: bool
         required: false
         default: true
@@ -83,7 +83,7 @@ argument_specs:
           - Whether to replace a secret engine with a different backend type at the mount point.
           - Set to false in production to prevent accidental replacements.
 
-      pki_vault_init_data_file:
+      vault_pki_vault_init_data_file:
         type: path
         required: false
         default: "/etc/vault.d/vault-init-data.json"
@@ -91,7 +91,7 @@ argument_specs:
           - Path to the Vault initialization data file containing the root token.
           - This file is created by the vault role during initialization.
 
-      pki_vault_certificate_enabled:
+      vault_pki_vault_certificate_enabled:
         type: bool
         required: false
         default: false
@@ -100,7 +100,7 @@ argument_specs:
           - Must be explicitly enabled to issue the certificate.
           - Requires intermediate CA to be configured first.
 
-      pki_vault_certificate_common_name:
+      vault_pki_vault_certificate_common_name:
         type: str
         required: false
         default: "vault.{{ domain }}"
@@ -109,7 +109,7 @@ argument_specs:
           - Should match the hostname used to access Vault.
           - Must be allowed by the PKI role's domain constraints.
 
-      pki_vault_certificate_alt_names:
+      vault_pki_vault_certificate_alt_names:
         type: list
         elements: str
         required: false
@@ -120,7 +120,7 @@ argument_specs:
           - DNS names that should be valid for the certificate.
           - Include all DNS names used to access Vault.
 
-      pki_vault_certificate_ip_sans:
+      vault_pki_vault_certificate_ip_sans:
         type: list
         elements: str
         required: false
@@ -131,7 +131,7 @@ argument_specs:
           - Defaults to the host's primary IPv4 address.
           - Include all IP addresses used to access Vault.
 
-      pki_vault_certificate_role_30:
+      vault_pki_vault_certificate_role_30:
         type: str
         required: false
         default: "sflab-local-30"
@@ -140,7 +140,7 @@ argument_specs:
           - The role must be created before issuing certificates.
           - Defaults to the sflab-local-30 role created by this role.
 
-      pki_vault_certificate_ttl_30:
+      vault_pki_vault_certificate_ttl_30:
         type: str
         required: false
         default: "720h"
@@ -150,7 +150,7 @@ argument_specs:
           - Default is 30 days (720 hours).
           - Must not exceed the PKI role's max_ttl.
 
-      pki_vault_certificate_role_90:
+      vault_pki_vault_certificate_role_90:
         type: str
         required: false
         default: "sflab-local-90"
@@ -159,7 +159,7 @@ argument_specs:
           - The role must be created before issuing certificates.
           - Defaults to the sflab-local-90 role created by this role.
 
-      pki_vault_certificate_ttl_90:
+      vault_pki_vault_certificate_ttl_90:
         type: str
         required: false
         default: "2160h"
@@ -169,7 +169,7 @@ argument_specs:
           - Default is 90 days (2160 hours).
           - Must not exceed the PKI role's max_ttl.
 
-      pki_vault_certificate_role_365:
+      vault_pki_vault_certificate_role_365:
         type: str
         required: false
         default: "sflab-local-365"
@@ -178,7 +178,7 @@ argument_specs:
           - The role must be created before issuing certificates.
           - Defaults to the sflab-local-365 role created by this role.
 
-      pki_vault_certificate_ttl_365:
+      vault_pki_vault_certificate_ttl_365:
         type: str
         required: false
         default: "8760h"
@@ -188,7 +188,7 @@ argument_specs:
           - Default is 365 days (8760 hours).
           - Must not exceed the PKI role's max_ttl.
 
-      pki_vault_certificate_role_3650:
+      vault_pki_vault_certificate_role_3650:
         type: str
         required: false
         default: "sflab-local-3650"
@@ -197,7 +197,7 @@ argument_specs:
           - The role must be created before issuing certificates.
           - Defaults to the sflab-local-3650 role created by this role.
 
-      pki_vault_certificate_ttl_3650:
+      vault_pki_vault_certificate_ttl_3650:
         type: str
         required: false
         default: "87600h"
@@ -207,7 +207,7 @@ argument_specs:
           - Default is 10 years (87600 hours).
           - Must not exceed the PKI role's max_ttl.
 
-      pki_vault_tls_directory:
+      vault_pki_vault_tls_directory:
         type: path
         required: false
         default: "/etc/vault.d/tls"
@@ -216,27 +216,27 @@ argument_specs:
           - Will be created if it does not exist.
           - Owner and group will be set to vault.
 
-      pki_vault_certificate_path:
+      vault_pki_vault_certificate_path:
         type: path
         required: false
-        default: "{{ pki_vault_tls_directory }}/vault.crt"
+        default: "{{ vault_pki_vault_tls_directory }}/vault.crt"
         description:
           - Path where the certificate will be written.
           - Referenced in Vault's TLS listener configuration.
 
-      pki_vault_certificate_key_path:
+      vault_pki_vault_certificate_key_path:
         type: path
         required: false
-        default: "{{ pki_vault_tls_directory }}/vault.key"
+        default: "{{ vault_pki_vault_tls_directory }}/vault.key"
         description:
           - Path where the private key will be written.
           - Will be set to mode 0600 for security.
           - Referenced in Vault's TLS listener configuration.
 
-      pki_vault_certificate_fullchain_path:
+      vault_pki_vault_certificate_fullchain_path:
         type: path
         required: false
-        default: "{{ pki_vault_tls_directory }}/vault-fullchain.crt"
+        default: "{{ vault_pki_vault_tls_directory }}/vault-fullchain.crt"
         description:
           - Path where the full certificate chain will be written.
           - Includes the certificate and intermediate CA certificate.

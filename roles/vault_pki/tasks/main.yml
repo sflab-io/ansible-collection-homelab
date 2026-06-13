@@ -18,11 +18,11 @@
   ansible.builtin.import_tasks: sign_intermediate_csr.yml
 
 - name: Create roles for issuing certificates
-  ansible.builtin.import_tasks: create_pki_roles.yml
+  ansible.builtin.import_tasks: create_vault_pki_roles.yml
 
 - name: Configure ACME support
   ansible.builtin.import_tasks: configure_acme_support.yml
 
 - name: Issue TLS certificate for Vault from Intermediate CA
-  when: pki_vault_certificate_enabled | default(false)
+  when: vault_pki_vault_certificate_enabled | default(false)
   ansible.builtin.import_tasks: issue_vault_certificate.yml

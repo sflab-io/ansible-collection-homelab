@@ -1,0 +1,63 @@
+---
+vault_pki_vault_domain: "{{ domain }}"
+
+# Vault connection settings
+vault_pki_vault_api_protocol: "https" # Change to "https" after TLS is enabled
+vault_pki_vault_api_host: "{{ ansible_facts['fqdn'] }}"
+vault_pki_vault_api_port: 8200
+vault_pki_vault_api_validate_certs: false
+
+# Public HTTPS URL stored in PKI /config/cluster — used by ACME clients (e.g. Traefik) to
+# construct directory URLs. Must always be https regardless of vault_pki_vault_api_protocol.
+vault_pki_vault_cluster_path: "https://{{ vault_pki_vault_api_host }}:{{ vault_pki_vault_api_port }}/v1/{{ vault_pki_intermediate_mount_point }}"
+
+# Path to vault init data file (created by vault role)
+vault_pki_vault_init_data_file: "/etc/vault.d/vault-init-data.json"
+
+# PKI root CA secret engine configuration
+vault_pki_root_mount_point: "pki_root"
+vault_pki_root_description: "Root CA PKI secret engine"
+vault_pki_root_common_name: "Root CA"
+vault_pki_root_default_lease_ttl: "43800h" # 5 years
+vault_pki_root_max_lease_ttl: "87600h" # 10 years
+# Whether to replace a non-PKI secret engine at the mount point
+vault_pki_root_replace_different_backend: true
+
+# PKI intermediate CA secret engine configuration
+vault_pki_intermediate_mount_point: "pki_intermediate"
+vault_pki_intermediate_description: "Intermediate CA PKI secret engine"
+vault_pki_intermediate_common_name: "Intermediate CA"
+vault_pki_intermediate_default_lease_ttl: "43800h" # 5 years
+vault_pki_intermediate_max_lease_ttl: "87600h" # 10 years
+# Whether to replace a non-PKI secret engine at the mount point
+vault_pki_intermediate_replace_different_backend: true
+
+# PKI role for issuing Vault TLS certificates
+vault_pki_vault_certificate_role_30: "sflab-local-30"
+vault_pki_vault_certificate_ttl_30: "720h" # 30 days (matches sflab-local-30 role max TTL)
+vault_pki_vault_certificate_role_90: "sflab-local-90"
+vault_pki_vault_certificate_ttl_90: "2160h" # 90 days (matches sflab-local-90 role max TTL)
+vault_pki_vault_certificate_role_365: "sflab-local-365"
+vault_pki_vault_certificate_ttl_365: "8760h" # 365 days (matches sflab-local-365 role max TTL)
+vault_pki_vault_certificate_role_3650: "sflab-local-3650"
+vault_pki_vault_certificate_ttl_3650: "87600h" # 10 years (matches sflab-local-3650 role max TTL)
+
+# Vault TLS certificate configuration
+# Feature flag - must be explicitly enabled to issue certificate
+vault_pki_vault_certificate_enabled: false
+
+# Certificate renewal settings
+vault_pki_vault_certificate_renewal_days: 7 # Renew 7 days before expiry
+
+# File paths for certificate and key
+vault_pki_vault_tls_directory: /etc/vault.d/tls
+vault_pki_vault_certificate_path: "{{ vault_pki_vault_tls_directory }}/vault.crt"
+vault_pki_vault_certificate_key_path: "{{ vault_pki_vault_tls_directory }}/vault.key"
+vault_pki_vault_certificate_fullchain_path: "{{ vault_pki_vault_tls_directory }}/vault-fullchain.crt"
+
+# Certificate specification
+vault_pki_vault_certificate_common_name: "{{ ansible_host }}"
+vault_pki_vault_certificate_alt_names:
+  - "{{ ansible_host }}"
+vault_pki_vault_certificate_ip_sans:
+  - "{{ ansible_facts['default_ipv4']['address'] }}"

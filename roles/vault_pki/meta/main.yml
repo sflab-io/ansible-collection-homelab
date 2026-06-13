@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   author: Sebastian Freund
-  description: sflab.homelab pki Role
+  description: sflab.homelab vault_pki Role
   company: sflab
 
   license: MIT
