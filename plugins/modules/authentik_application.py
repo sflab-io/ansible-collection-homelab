@@ -155,14 +155,12 @@ def find_existing_application(core_api, slug: str, module: AnsibleModule):
         The application object if found, None otherwise.
     """
     try:
-        response = core_api.core_applications_list(slug=slug)
-        for app in response.results:
-            if app.slug == slug:
-                return app
-        return None
-    except ApiException:
+        return core_api.core_applications_retrieve(slug)
+    except ApiException as exc:
+        if exc.status == 404:
+            return None
         module.fail_json(
-            msg=f"Failed to retrieve applications from Authentik",
+            msg=f"Failed to retrieve application '{slug}' from Authentik",
             exception=traceback.format_exc(),
         )
 
