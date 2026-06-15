@@ -5,7 +5,7 @@
 docker_domain: "{{ ansible_host }}"
 
 # Vault PKI ACME directory endpoint URL
-docker_vault_acme_endpoint: "https://vault.{{ domain }}:8200/v1/pki_intermediate/acme/directory"
+docker_vault_acme_endpoint: "https://vault.{{ domain }}/v1/pki_intermediate/acme/directory"
 
 # ACME email address
 docker_acme_email: "acme@{{ domain }}"
