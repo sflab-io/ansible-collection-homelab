@@ -26,11 +26,11 @@ argument_specs:
       vault_pki_vault_cluster_path:
         type: str
         required: false
-        default: "https://{{ vault_pki_vault_api_host }}:{{ vault_pki_vault_api_port }}/v1/{{ vault_pki_intermediate_mount_point }}"
+        default: "{{ vault_pki_vault_api_protocol }}://{{ vault_pki_vault_api_host }}:{{ vault_pki_vault_api_port }}/v1/{{ vault_pki_intermediate_mount_point }}"
         description:
-          - Public HTTPS URL written to the PKI /config/cluster endpoint.
+          - Public URL written to the PKI /config/cluster endpoint.
           - Used by ACME clients (e.g. Traefik) to construct ACME directory URLs.
-          - Must always use https regardless of vault_pki_vault_api_protocol.
+          - Must match vault_pki_vault_api_protocol, since ACME clients connect to the Vault listener directly.
           - Overriding is only needed when the public URL differs from the API host.
 
       vault_pki_vault_api_port:

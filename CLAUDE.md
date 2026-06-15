@@ -6,8 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is `sflab.homelab`, an Ansible Collection for managing homelab infrastructure. The collection includes:
 
-- **Roles**: `common`, `docker`, `firewall`, `netbox`, `netbox_init`, `vault_pki`, `self_signed_certificate`, `technitium` (DNS), `vault` (HashiCorp Vault), and `vault_secrets`
-- **Plugins**: Action plugins, doc fragments, filters, lookups, modules (Vault PKI), and module utilities
+- **Roles**: `common`, `docker`, `firewall`, `netbox`, `netbox_init`, `vault_pki`, `self_signed_certificate`, `technitium` (DNS), `vault` (HashiCorp Vault), `vault_secrets`, `authentik`, and `authentik_init`
+- **Plugins**: Action plugins, doc fragments, filters, lookups, modules (Vault PKI and Authentik), and module utilities
 - **Testing**: Unit tests (pytest) and integration tests (molecule)
 - **Repository**: [sflab-io/ansible-collection-homelab](https://github.com/sflab-io/ansible-collection-homelab)
 
@@ -59,6 +59,7 @@ The project uses mise tasks for all common operations:
 ```bash
 mise run ansible:build      # Build collection archive via Dagger → outputs to ./dist/
 mise run ansible:release    # Build + create GitHub release (sflab-io/ansible-collection-homelab)
+mise run ansible:lint       # Run ansible-lint via Dagger (containerized)
 mise run python:install-requirements  # Install requirements.txt via uv
 ```
 
@@ -166,8 +167,10 @@ Note: `no-commit-to-branch` (blocking commits to main) is currently disabled. `i
 ```
 sflab.homelab/
 ├── roles/                    # Ansible roles
+│   ├── authentik/             # Authentik deployment (wraps ax-bzh.authentik)
+│   ├── authentik_init/        # Authentik provider/application/user sync
 │   ├── common/               # Common infrastructure setup
-│   ├── docker/               # Docker with Portainer, Traefik, Whoami
+│   ├── docker/               # Docker with Portainer, Traefik, Whoami, remote compose stacks
 │   ├── firewall/             # OPNsense firewall configuration
 │   ├── netbox/               # NetBox IPAM/DCIM
 │   ├── netbox_init/          # NetBox initialization
@@ -243,6 +246,7 @@ The Vault role implements HashiCorp Vault installation and configuration directl
 
 - `tasks/main.yml` - Orchestrates task sequence
 - `tasks/validate/main.yml` - Pre-flight validation (listener, raft)
+- `tasks/repository.yml` - Add HashiCorp APT repository
 - `tasks/user.yml` - Create vault user
 - `tasks/directories.yml` - Create required directories
 - `tasks/install.yml` - Install Vault binary
@@ -251,6 +255,26 @@ The Vault role implements HashiCorp Vault installation and configuration directl
 - `tasks/uninit.yml` - Vault uninitialization
 
 **Pattern**: Sequential task execution with validation, following a setup-install-configure workflow.
+
+#### Authentik Role Pattern
+
+**Type**: Wrapper/implementation role
+
+The `authentik` role deploys Authentik by including the external `ax-bzh.authentik` role with
+homelab-specific configuration (Traefik labels, brands, bootstrap users/groups), then stores the
+generated API token in Vault KV via `tasks/store_api_token.yml`.
+
+**Task files**: `tasks/main.yml`, `tasks/store_api_token.yml`
+
+#### Authentik Init Role Pattern
+
+**Type**: Orchestration role using custom modules (`delegate_to: localhost`)
+
+The `authentik_init` role syncs NetBox users into Authentik and creates OAuth2/OIDC providers and
+applications using the `authentik_users`, `authentik_provider`, and `authentik_application`
+modules, looping over the `providers` and `applications` variables.
+
+**Task files**: `tasks/main.yml`
 
 #### Firewall Role Pattern
 
@@ -292,7 +316,9 @@ All plugins follow standard Ansible plugin interfaces:
 - `plugins/action/` - Action plugins
 - `plugins/filter/` - Jinja2 filter plugins
 - `plugins/lookup/` - Lookup plugins
-- `plugins/modules/` - Ansible modules: `vault_init.py`, `vault_unseal.py`, `vault_write.py`, `vault_secrets_tune.py`, `vault_kv_secret_engine.py`, `vault_pki_secret_engine.py`, `vault_pki_root_ca_certificate.py`, `vault_pki_generate_intermediate_csr.py`, `vault_pki_sign_intermediate.py`, `vault_pki_set_signed_intermediate.py`, `vault_pki_role.py`
+- `plugins/modules/` - Ansible modules:
+  - Vault: `vault_init.py`, `vault_unseal.py`, `vault_write.py`, `vault_secrets_tune.py`, `vault_kv_secret_engine.py`, `vault_pki_secret_engine.py`, `vault_pki_root_ca_certificate.py`, `vault_pki_generate_intermediate_csr.py`, `vault_pki_sign_intermediate.py`, `vault_pki_set_signed_intermediate.py`, `vault_pki_role.py`
+  - Authentik: `authentik_users.py`, `authentik_provider.py`, `authentik_application.py`
 - `plugins/test/` - Test plugins
 - `plugins/cache/` - Cache plugins
 - `plugins/inventory/` - Inventory plugins
@@ -300,6 +326,11 @@ All plugins follow standard Ansible plugin interfaces:
 - `plugins/plugin_utils/` - Shared utilities for plugins
 - `plugins/sub_plugins/` - Sub-plugins (nested plugin support)
 - `plugins/doc_fragments/` - Shared documentation fragments: `auth.py`, `connection.py`, `action_group.py`, `engine_mount.py`, `check_mode.py`, `check_mode_none.py`, `requirements.py`, `secret_engine.py`
+
+**Action groups** (defined in `meta/runtime.yml`, allow setting shared `module_defaults` per group):
+
+- `vault` - all `vault_*` modules
+- `authentik` - `authentik_users`, `authentik_provider`, `authentik_application`
 
 ### Testing Strategy
 

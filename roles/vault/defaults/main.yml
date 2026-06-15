@@ -1,6 +1,4 @@
 ---
-# defaults file for sflab.homelab.vault
-
 vault_api_validate_certs: false
 
 vault_configure_logrotate: true

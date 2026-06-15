@@ -2,14 +2,15 @@
 vault_pki_vault_domain: "{{ domain }}"
 
 # Vault connection settings
-vault_pki_vault_api_protocol: "https" # Change to "https" after TLS is enabled
+vault_pki_vault_api_protocol: "http" # Change to "https" after TLS is enabled
 vault_pki_vault_api_host: "{{ ansible_facts['fqdn'] }}"
 vault_pki_vault_api_port: 8200
 vault_pki_vault_api_validate_certs: false
 
-# Public HTTPS URL stored in PKI /config/cluster — used by ACME clients (e.g. Traefik) to
-# construct directory URLs. Must always be https regardless of vault_pki_vault_api_protocol.
-vault_pki_vault_cluster_path: "https://{{ vault_pki_vault_api_host }}:{{ vault_pki_vault_api_port }}/v1/{{ vault_pki_intermediate_mount_point }}"
+# Public URL stored in PKI /config/cluster — used by ACME clients (e.g. Traefik) to
+# construct directory URLs. Must match the scheme of vault_pki_vault_api_protocol, since
+# ACME clients connect to the Vault listener directly (TLS termination is handled by Traefik).
+vault_pki_vault_cluster_path: "{{ vault_pki_vault_api_protocol }}://{{ vault_pki_vault_api_host }}:{{ vault_pki_vault_api_port }}/v1/{{ vault_pki_intermediate_mount_point }}"
 
 # Path to vault init data file (created by vault role)
 vault_pki_vault_init_data_file: "/etc/vault.d/vault-init-data.json"
