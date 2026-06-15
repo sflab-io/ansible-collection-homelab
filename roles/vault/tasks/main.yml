@@ -19,3 +19,7 @@
 
 - name: Init vault
   ansible.builtin.import_tasks: init.yml
+
+- name: Configure OIDC auth method
+  ansible.builtin.include_tasks: oidc.yml
+  when: vault_oidc_enabled

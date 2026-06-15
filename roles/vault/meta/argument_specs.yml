@@ -317,3 +317,70 @@ argument_specs:
           - The node ID for the Vault service.
           - If *vault_backend* is set to `raft`, this is required.
           - "Reference: https://developer.hashicorp.com/vault/docs/configuration/storage/raft#node_id"
+      vault_oidc_enabled:
+        type: bool
+        required: false
+        default: false
+        description:
+          - Whether to configure Vault's OIDC auth method against Authentik.
+          - "Reference: https://developer.hashicorp.com/vault/docs/auth/jwt"
+      vault_oidc_authentik_url:
+        type: str
+        required: false
+        default: ""
+        description:
+          - Base URL of the Authentik instance used as the OIDC discovery provider.
+          - If *vault_oidc_enabled* is set to `true`, this is required.
+      vault_oidc_authentik_slug:
+        type: str
+        required: false
+        default: "vault"
+        description:
+          - Slug of the Authentik application providing the OIDC discovery document.
+          - The OIDC discovery URL is built as "{{ vault_oidc_authentik_url }}/application/o/{{ vault_oidc_authentik_slug }}/".
+      vault_oidc_client_id:
+        type: str
+        required: false
+        default: ""
+        description:
+          - OAuth2 client ID of the Authentik provider for Vault.
+          - If *vault_oidc_enabled* is set to `true`, this is required.
+      vault_oidc_client_secret:
+        type: str
+        required: false
+        default: ""
+        description:
+          - OAuth2 client secret of the Authentik provider for Vault.
+          - If *vault_oidc_enabled* is set to `true`, this is required.
+      vault_oidc_default_role:
+        type: str
+        required: false
+        default: "reader"
+        description:
+          - Name of the Vault OIDC role and ACL policy created for users authenticating via OIDC.
+      vault_oidc_allowed_redirect_uris:
+        type: list
+        required: false
+        elements: str
+        default: []
+        description:
+          - List of redirect URIs allowed for the Vault OIDC role.
+          - Must include the Vault UI callback and, for CLI login, "http://localhost:8250/oidc/callback".
+      vault_oidc_reader_policy:
+        type: str
+        required: false
+        description:
+          - HCL policy document assigned to *vault_oidc_default_role*.
+          - "Reference: https://developer.hashicorp.com/vault/docs/concepts/policies"
+      vault_oidc_token_ttl:
+        type: str
+        required: false
+        default: "1h"
+        description:
+          - Token TTL for the Vault OIDC role.
+      vault_oidc_token_max_ttl:
+        type: str
+        required: false
+        default: "24h"
+        description:
+          - Maximum token TTL for the Vault OIDC role.

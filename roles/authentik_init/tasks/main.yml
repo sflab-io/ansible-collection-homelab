@@ -9,8 +9,7 @@
     name: "{{ provider.provider_name }}"
     authorization_flow: "{{ provider.authorization_flow }}"
     invalidation_flow: "{{ provider.invalidation_flow }}"
-    redirect_uris:
-      - "{{ provider.redirect_uri }}"
+    redirect_uris: "{{ provider.redirect_uris | default([provider.redirect_uri]) }}"
     scopes: "{{ provider.scopes }}"
     signing_key: "{{ provider.signing_key }}"
     state: present

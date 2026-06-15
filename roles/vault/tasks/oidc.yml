@@ -1,0 +1,103 @@
+---
+#
+# Configures OIDC authentication in Vault using Authentik as the identity provider.
+#
+# Prerequisites:
+#   - Vault must be initialized and unsealed (init.yml has run)
+#   - vault_oidc_client_id and vault_oidc_client_secret must be set
+#   - vault_oidc_authentik_url must point to the Authentik instance
+#
+
+- name: Set vault init data file path
+  ansible.builtin.set_fact:
+    __vault_oidc_init_data_file: "/etc/vault.d/vault-init-data.json"
+
+- name: Load vault init data
+  ansible.builtin.slurp:
+    src: "{{ __vault_oidc_init_data_file }}"
+  register: __vault_oidc_init_data_content
+
+- name: Set vault root token
+  ansible.builtin.set_fact:
+    __vault_oidc_root_token: "{{ __vault_oidc_init_data_content.content | b64decode | from_json | json_query('root_token') }}"
+
+- name: Get active auth methods
+  ansible.builtin.uri:
+    url: "{{ vault_api_protocol }}://{{ vault_api_host }}:{{ vault_api_port }}/v1/sys/auth"
+    method: GET
+    headers:
+      X-Vault-Token: "{{ __vault_oidc_root_token }}"
+    validate_certs: "{{ vault_api_validate_certs }}"
+    return_content: true
+    status_code: 200
+  register: __vault_oidc_auth_methods
+  changed_when: false
+  check_mode: false
+
+- name: Enable OIDC auth method
+  ansible.builtin.uri:
+    url: "{{ vault_api_protocol }}://{{ vault_api_host }}:{{ vault_api_port }}/v1/sys/auth/oidc"
+    method: POST
+    headers:
+      X-Vault-Token: "{{ __vault_oidc_root_token }}"
+    body_format: json
+    body:
+      type: "oidc"
+      description: "OIDC authentication via Authentik"
+    validate_certs: "{{ vault_api_validate_certs }}"
+    status_code: 204
+  when: "'oidc/' not in (__vault_oidc_auth_methods.json | default({}))"
+
+- name: Configure OIDC auth method
+  ansible.builtin.uri:
+    url: "{{ vault_api_protocol }}://{{ vault_api_host }}:{{ vault_api_port }}/v1/auth/oidc/config"
+    method: POST
+    headers:
+      X-Vault-Token: "{{ __vault_oidc_root_token }}"
+    body_format: json
+    body:
+      oidc_discovery_url: "{{ vault_oidc_authentik_url }}/application/o/{{ vault_oidc_authentik_slug }}/"
+      oidc_client_id: "{{ vault_oidc_client_id }}"
+      oidc_client_secret: "{{ vault_oidc_client_secret }}"
+      default_role: "{{ vault_oidc_default_role }}"
+    validate_certs: "{{ vault_api_validate_certs }}"
+    status_code: 204
+
+- name: Create OIDC reader ACL policy
+  ansible.builtin.uri:
+    url: "{{ vault_api_protocol }}://{{ vault_api_host }}:{{ vault_api_port }}/v1/sys/policies/acl/{{ vault_oidc_default_role }}"
+    method: PUT
+    headers:
+      X-Vault-Token: "{{ __vault_oidc_root_token }}"
+    body_format: json
+    body:
+      policy: "{{ vault_oidc_reader_policy }}"
+    validate_certs: "{{ vault_api_validate_certs }}"
+    status_code: 204
+
+- name: Create OIDC role
+  ansible.builtin.uri:
+    url: "{{ vault_api_protocol }}://{{ vault_api_host }}:{{ vault_api_port }}/v1/auth/oidc/role/{{ vault_oidc_default_role }}"
+    method: POST
+    headers:
+      X-Vault-Token: "{{ __vault_oidc_root_token }}"
+    body_format: json
+    body:
+      bound_audiences:
+        - "{{ vault_oidc_client_id }}"
+      allowed_redirect_uris: "{{ vault_oidc_allowed_redirect_uris }}"
+      user_claim: "sub"
+      token_policies:
+        - "{{ vault_oidc_default_role }}"
+      token_ttl: "{{ vault_oidc_token_ttl }}"
+      token_max_ttl: "{{ vault_oidc_token_max_ttl }}"
+    validate_certs: "{{ vault_api_validate_certs }}"
+    status_code: 204
+
+- name: Debug OIDC configuration result
+  ansible.builtin.debug:
+    msg: |
+      Vault OIDC auth configured successfully.
+      Discovery URL: {{ vault_oidc_authentik_url }}/application/o/{{ vault_oidc_authentik_slug }}/
+      Default role: {{ vault_oidc_default_role }}
+      Allowed redirect URIs: {{ vault_oidc_allowed_redirect_uris }}

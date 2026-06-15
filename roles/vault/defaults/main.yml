@@ -64,3 +64,17 @@ vault_raft_autopilot_update_interval: 2s
 
 vault_raft_retry_auto_join: []
 vault_raft_retry_join: []
+
+vault_oidc_enabled: false
+vault_oidc_authentik_url: ""
+vault_oidc_authentik_slug: "vault"
+vault_oidc_client_id: ""
+vault_oidc_client_secret: ""
+vault_oidc_default_role: "reader"
+vault_oidc_allowed_redirect_uris: []
+vault_oidc_reader_policy: |
+  path "secret/*" {
+    capabilities = ["read", "list"]
+  }
+vault_oidc_token_ttl: "1h"
+vault_oidc_token_max_ttl: "24h"
