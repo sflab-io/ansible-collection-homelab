@@ -8,7 +8,3 @@
   loop: "{{ docker_deploy_stacks }}"
   loop_control:
     loop_var: item
-
-- name: Include task to deploy compose remote files for services
-  ansible.builtin.include_tasks: compose_remote.yml
-  when: compose_remote_stacks is defined and compose_remote_stacks | length > 0

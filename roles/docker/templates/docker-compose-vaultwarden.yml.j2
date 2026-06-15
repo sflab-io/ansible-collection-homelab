@@ -1,0 +1,40 @@
+---
+# {{ ansible_managed }}
+# Docker Compose configuration for Vaultwarden password manager
+#
+# This configuration deploys Vaultwarden behind Traefik reverse proxy
+# with automatic TLS certificate management via HashiCorp Vault PKI ACME.
+#
+# Routing configured (subdomain):
+# - https://${HOST} -> Vaultwarden web UI
+
+services:
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    restart: unless-stopped
+    environment:
+      DOMAIN: "https://${HOST}"
+      # Token generieren: docker run --rm -it vaultwarden/server /vaultwarden hash --preset owasp
+      ADMIN_TOKEN: "${ADMIN_TOKEN}"
+      SIGNUPS_ALLOWED: "false"
+      LOG_LEVEL: warn
+    volumes:
+      - ./data:/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.vaultwarden.rule=Host(`${HOST}`)"
+      - "traefik.http.routers.vaultwarden.entrypoints=websecure"
+      - "traefik.http.routers.vaultwarden.tls=true"
+      - "traefik.http.routers.vaultwarden.tls.certresolver=vault"
+      - "traefik.http.routers.vaultwarden.service=vaultwarden-svc"
+      - "traefik.http.routers.vaultwarden.middlewares=secure-headers"
+      - "traefik.http.services.vaultwarden-svc.loadbalancer.server.port=80"
+    networks:
+      - {{ docker_traefik_proxy_network }}
+
+# Networks
+networks:
+  # Use the existing proxy network created by Traefik
+  {{ docker_traefik_proxy_network }}:
+    external: true
