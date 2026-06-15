@@ -16,13 +16,6 @@
     fail_msg: The listener port is not valid.
     success_msg: The listener port is valid.
 
-- name: Validate listener cluster IP address
-  ansible.builtin.assert:
-    that:
-      - _listener.cluster_address is ansible.utils.ipv4
-    fail_msg: The listener cluster IP address is not valid.
-    success_msg: The listener cluster IP address is valid.
-
 - name: Validate listener cluster port
   when:
     - _listener.cluster_port is defined

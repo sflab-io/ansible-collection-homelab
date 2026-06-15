@@ -11,7 +11,7 @@
 
 - name: Check if Vault is already initialized
   ansible.builtin.uri:
-    url: "{{ vault_api_protocol }}://{{ ansible_facts['default_ipv4']['address'] }}:{{ vault_api_port }}/v1/sys/init"
+    url: "{{ vault_api_protocol }}://{{ vault_api_host }}:{{ vault_api_port }}/v1/sys/init"
     method: GET
     return_content: true
     status_code: 200
@@ -47,7 +47,7 @@
 
 - name: Initialize Vault
   sflab.homelab.vault_init:
-    url: "{{ vault_api_protocol }}://{{ ansible_facts['default_ipv4']['address'] }}:{{ vault_api_port }}"
+    url: "{{ vault_api_protocol }}://{{ vault_api_host }}:{{ vault_api_port }}"
     secret_shares: 5
     secret_threshold: 3
     validate_certs: "{{ vault_api_validate_certs }}"
@@ -78,7 +78,7 @@
 
 - name: Check Vault seal status
   ansible.builtin.uri:
-    url: "{{ vault_api_protocol }}://{{ ansible_facts['default_ipv4']['address'] }}:{{ vault_api_port }}/v1/sys/seal-status"
+    url: "{{ vault_api_protocol }}://{{ vault_api_host }}:{{ vault_api_port }}/v1/sys/seal-status"
     method: GET
     validate_certs: "{{ vault_api_validate_certs }}"
     return_content: true
@@ -87,7 +87,7 @@
 
 - name: Unseal Vault
   sflab.homelab.vault_unseal:
-    url: "{{ vault_api_protocol }}://{{ ansible_facts['default_ipv4']['address'] }}:{{ vault_api_port }}"
+    url: "{{ vault_api_protocol }}://{{ vault_api_host }}:{{ vault_api_port }}"
     unseal_keys: "{{ vault_init_result.keys_base64[:3] }}"
     validate_certs: "{{ vault_api_validate_certs }}"
   when:
@@ -97,7 +97,7 @@
 
 - name: Verify Vault is unsealed
   ansible.builtin.uri:
-    url: "{{ vault_api_protocol }}://{{ ansible_facts['default_ipv4']['address'] }}:{{ vault_api_port }}/v1/sys/seal-status"
+    url: "{{ vault_api_protocol }}://{{ vault_api_host }}:{{ vault_api_port }}/v1/sys/seal-status"
     method: GET
     validate_certs: "{{ vault_api_validate_certs }}"
     return_content: true
