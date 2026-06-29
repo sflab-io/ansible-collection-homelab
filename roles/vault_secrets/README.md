@@ -89,7 +89,7 @@ After the role runs, you can use the credentials with `community.hashi_vault.vau
 
 - name: Write a secret to Vault
   community.hashi_vault.vault_kv2_write:
-    url: "https://vault.home.sflab.io:8200"
+    url: "https://vault.home.sflab.io"
     auth_method: approle
     role_id: "{{ _approle_creds.role_id }}"
     secret_id: "{{ _approle_creds.secret_id }}"
